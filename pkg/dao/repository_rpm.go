@@ -5,7 +5,6 @@ import (
 
 	"github.com/content-services/content-sources-backend/pkg/api"
 	"github.com/content-services/content-sources-backend/pkg/models"
-	"github.com/openlyinc/pointy"
 	"gorm.io/gorm"
 )
 
@@ -132,9 +131,9 @@ func (r repositoryRpmDaoImpl) Fetch(OrgID string, AccountId string, uuid string)
 		return nil, DBErrorToApi(err)
 	}
 
-	var epoch *int32
+	var epoch *int
 	if repoRpm.Epoch != nil {
-		epoch = pointy.Int32(*repoRpm.Epoch)
+		epoch = repoRpm.Epoch
 	}
 	return &api.RepositoryRpm{
 		UUID:        repoRpm.Base.UUID,

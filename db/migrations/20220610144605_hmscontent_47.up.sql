@@ -10,7 +10,8 @@ CREATE TABLE IF NOT EXISTS repositories (
     url VARCHAR(255) NOT NULL,
     last_read_time TIMESTAMP WITH TIME ZONE DEFAULT NULL,
     last_read_error VARCHAR(255) DEFAULT NULL,
-    refer_repo_config UUID DEFAULT NULL
+    refer_repo_config UUID DEFAULT NULL,
+    public bool DEFAULT FALSE
 );
 
 ALTER TABLE ONLY repositories
@@ -18,6 +19,9 @@ ADD CONSTRAINT fk_repositories
 FOREIGN KEY (refer_repo_config)
 REFERENCES repository_configurations(uuid)
 ON DELETE SET NULL;
+
+ALTER TABLE repositories
+    ADD CONSTRAINT url_unique UNIQUE (url);
 
 --
 -- repository_rpms
@@ -40,5 +44,8 @@ ALTER TABLE ONLY repository_rpms
 ADD CONSTRAINT fk_repositories_rpms
 FOREIGN KEY (refer_repo) REFERENCES repositories(uuid)
 ON DELETE CASCADE;
+
+ALTER TABLE repository_rpms
+    ADD CONSTRAINT nvera_repo_uniq UNIQUE (name, arch, version, release, epoch, refer_repo);
 
 COMMIT;

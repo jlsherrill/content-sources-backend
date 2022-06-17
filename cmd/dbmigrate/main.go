@@ -69,8 +69,9 @@ func main() {
 		if err := upMigrationCmd.Parse(args[2:]); err != nil {
 			log.Fatal().Err(err)
 		}
+		fmt.Println(upMigrationSteps)
 		if err := db.MigrateDB(dbURL, "up", *upMigrationSteps); err != nil {
-			log.Fatal().Err(err)
+			log.Fatal().Err(err).Msg("Failed To mIgrate")
 		}
 		log.Debug().Msg("Successfully migrated up")
 	} else if args[1] == "down" {

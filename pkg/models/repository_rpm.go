@@ -1,7 +1,6 @@
 package models
 
 import (
-	"github.com/openlyinc/pointy"
 	"gorm.io/gorm"
 )
 
@@ -22,7 +21,7 @@ type RepositoryRpm struct {
 	// on version numbers. It's default value is 0 and this
 	// is assumed if an Epoch directive is not listed in the RPM SPEC file.
 	// https://access.redhat.com/documentation/en-us/red_hat_enterprise_linux/8/html/packaging_and_distributing_software/advanced-topics#packaging-epoch_epoch-scriplets-and-triggers
-	Epoch       *int32     `json:"epoch" gorm:"default:0;not null"`
+	Epoch       *int       `json:"epoch" gorm:"default:0;not null"`
 	Summary     string     `json:"summary" gorm:"not null"`
 	Description string     `json:"description" gorm:"not null"`
 	ReferRepo   string     `gorm:"not null"`
@@ -50,7 +49,7 @@ func (r *RepositoryRpm) DeepCopy() *RepositoryRpm {
 		Arch:        r.Arch,
 		Version:     r.Version,
 		Release:     r.Release,
-		Epoch:       pointy.Int32(*r.Epoch),
+		Epoch:       r.Epoch,
 		Summary:     r.Summary,
 		Description: r.Description,
 	}

@@ -11,6 +11,8 @@ type Repository struct {
 	Base
 	// Repository URL
 	URL string `json:"url" gorm:"not null"`
+	//This repository is publicly accessible
+	Public bool `json:"bool" gorm:"not null"`
 	// Last time the repo meta data was read
 	LastReadTime *time.Time `gorm:"default:null"`
 	// Last time the repo meta data failed to be read

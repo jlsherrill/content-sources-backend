@@ -2,7 +2,10 @@ module github.com/content-services/content-sources-backend
 
 go 1.16
 
+replace github.com/content-services/yummy => /home/jlsherri/git/yummy/
+
 require (
+	github.com/content-services/yummy v0.0.4
 	github.com/getkin/kin-openapi v0.94.0
 	github.com/golang-migrate/migrate/v4 v4.15.2
 	github.com/google/uuid v1.3.0

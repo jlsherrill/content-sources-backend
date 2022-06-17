@@ -20,7 +20,7 @@ type RepositoryRpm struct {
 	// on version numbers. It's default value is 0 and this
 	// is assumed if an Epoch directive is not listed in the RPM SPEC file.
 	// https://access.redhat.com/documentation/en-us/red_hat_enterprise_linux/8/html/packaging_and_distributing_software/advanced-topics#packaging-epoch_epoch-scriplets-and-triggers
-	Epoch       *int32 `json:"epoch"`
+	Epoch       *int   `json:"epoch"`
 	Summary     string `json:"summary"`
 	Description string `json:"description"`
 	// RepoReference point out an existing Repository record
@@ -45,7 +45,7 @@ func (r *RepositoryRpm) CopyFromModel(m *models.RepositoryRpm) {
 		r.Arch = m.Arch
 		r.Version = m.Version
 		r.Release = m.Release
-		r.Epoch = pointy.Int32(*m.Epoch)
+		r.Epoch = pointy.Int(*m.Epoch)
 		r.Summary = m.Summary
 		r.Description = m.Description
 	}

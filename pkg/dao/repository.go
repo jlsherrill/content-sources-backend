@@ -2,17 +2,19 @@ package dao
 
 import (
 	"github.com/content-services/content-sources-backend/pkg/api"
-	"github.com/content-services/content-sources-backend/pkg/db"
 	"github.com/content-services/content-sources-backend/pkg/models"
 	"github.com/jackc/pgconn"
 	"gorm.io/gorm"
 )
 
 type repositoryDaoImpl struct {
+	db *gorm.DB
 }
 
-func GetRepositoryDao() RepositoryDao {
-	return repositoryDaoImpl{}
+func GetRepositoryDao(db *gorm.DB) RepositoryDao {
+	return repositoryDaoImpl{
+		db: db,
+	}
 }
 
 func DBErrorToApi(e error) error {
@@ -36,7 +38,7 @@ func (r repositoryDaoImpl) Create(newRepo api.RepositoryRequest) error {
 	}
 	ApiFieldsToModel(&newRepo, &newRepoConfig)
 
-	if err := db.DB.Create(&newRepoConfig).Error; err != nil {
+	if err := r.db.Create(&newRepoConfig).Error; err != nil {
 		return DBErrorToApi(err)
 	}
 	return nil
@@ -46,12 +48,12 @@ func (r repositoryDaoImpl) List(OrgID string, limit int, offset int) (api.Reposi
 	var totalRepos int64
 	repoConfigs := make([]models.RepositoryConfiguration, 0)
 
-	result := db.DB.Where("org_id = ?", OrgID).Find(&repoConfigs).Count(&totalRepos)
+	result := r.db.Where("org_id = ?", OrgID).Find(&repoConfigs).Count(&totalRepos)
 	if result.Error != nil {
 		return api.RepositoryCollectionResponse{}, totalRepos, result.Error
 	}
 
-	result = db.DB.Where("org_id = ?", OrgID).Limit(limit).Offset(offset).Find(&repoConfigs)
+	result = r.db.Where("org_id = ?", OrgID).Limit(limit).Offset(offset).Find(&repoConfigs)
 	if result.Error != nil {
 		return api.RepositoryCollectionResponse{}, totalRepos, result.Error
 	}
@@ -72,7 +74,7 @@ func (r repositoryDaoImpl) Fetch(orgID string, uuid string) (api.RepositoryRespo
 
 func (r repositoryDaoImpl) fetchRepoConfig(orgID string, uuid string) (models.RepositoryConfiguration, error) {
 	found := models.RepositoryConfiguration{}
-	result := db.DB.Where("UUID = ? AND ORG_ID = ?", uuid, orgID).First(&found)
+	result := r.db.Where("UUID = ? AND ORG_ID = ?", uuid, orgID).First(&found)
 
 	if result.Error != nil {
 		if result.Error == gorm.ErrRecordNotFound {
@@ -90,7 +92,7 @@ func (r repositoryDaoImpl) Update(orgID string, uuid string, repoParams api.Repo
 		return err
 	}
 	ApiFieldsToModel(&repoParams, &repoConfig)
-	result := db.DB.Model(&repoConfig).Updates(repoConfig.MapForUpdate())
+	result := r.db.Model(&repoConfig).Updates(repoConfig.MapForUpdate())
 	if result.Error != nil {
 		return DBErrorToApi(result.Error)
 	}
@@ -99,14 +101,14 @@ func (r repositoryDaoImpl) Update(orgID string, uuid string, repoParams api.Repo
 
 func (r repositoryDaoImpl) Delete(orgID string, uuid string) error {
 	repoConfig := models.RepositoryConfiguration{}
-	if err := db.DB.Debug().Where("UUID = ? AND ORG_ID = ?", uuid, orgID).First(&repoConfig).Error; err != nil {
+	if err := r.db.Debug().Where("UUID = ? AND ORG_ID = ?", uuid, orgID).First(&repoConfig).Error; err != nil {
 		if err == gorm.ErrRecordNotFound {
 			return &Error{NotFound: true, Message: "Could not find repository with UUID " + uuid}
 		} else {
 			return err
 		}
 	}
-	if err := db.DB.Delete(&repoConfig).Error; err != nil {
+	if err := r.db.Delete(&repoConfig).Error; err != nil {
 		return err
 	}
 	return nil

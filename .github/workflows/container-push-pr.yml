@@ -12,6 +12,7 @@ jobs:
     steps:
       - uses: actions/checkout@v2
       - name: Log in to the Redhat Container registry
+        if: github.event.pull_request.draft == false
         uses: redhat-actions/podman-login@v1
         with:
           registry: registry.redhat.io

@@ -10,7 +10,7 @@ CREATE TABLE IF NOT EXISTS repositories (
     url VARCHAR(255) NOT NULL,
     last_read_time TIMESTAMP WITH TIME ZONE DEFAULT NULL,
     last_read_error VARCHAR(255) DEFAULT NULL,
-    public boolean NOT NULL DEFAULT FALSE
+    public BOOLEAN NOT NULL DEFAULT FALSE
 );
 
 ALTER TABLE repositories
@@ -30,7 +30,7 @@ CREATE TABLE IF NOT EXISTS repository_configurations(
     account_id VARCHAR (255) NOT NULL,
     org_id VARCHAR (255) NOT NULL,
     repository_uuid UUID NOT NULL
-    );
+);
 
 ALTER TABLE repository_configurations
 ADD CONSTRAINT repo_and_org_id_unique UNIQUE (repository_uuid, org_id);

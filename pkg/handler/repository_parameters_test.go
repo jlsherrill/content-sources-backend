@@ -50,7 +50,6 @@ func (suite *RepositoryParameterSuite) TestListParams() {
 	assert.Equal(t, http.StatusOK, code)
 	assert.NotEmpty(t, response.DistributionArches)
 	assert.NotEmpty(t, response.DistributionVersions)
-
 }
 
 func TestRepositoryParameterSuite(t *testing.T) {

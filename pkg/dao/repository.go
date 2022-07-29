@@ -14,7 +14,7 @@ type repositoryDaoImpl struct {
 	db *gorm.DB
 }
 
-func GetRepositoryDao(db *gorm.DB) RepositoryDao {
+func GetRepositoryDao(db *gorm.DB    ) RepositoryDao {
 	return repositoryDaoImpl{
 		db: db,
 	}

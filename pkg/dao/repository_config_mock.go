@@ -55,6 +55,19 @@ func (r *MockRepositoryConfigDao) Fetch(orgID string, uuid string) (api.Reposito
 	}
 }
 
+func (r *MockRepositoryConfigDao) FetchByRepoUuid(orgID string, uuid string) (api.RepositoryResponse, error) {
+	args := r.Called(orgID, uuid)
+	if args.Get(0) == nil {
+		return api.RepositoryResponse{}, args.Error(0)
+	}
+	rr, ok := args.Get(0).(api.RepositoryResponse)
+	if ok {
+		return rr, args.Error(1)
+	} else {
+		return api.RepositoryResponse{}, args.Error(1)
+	}
+}
+
 func (r *MockRepositoryConfigDao) List(
 	orgID string,
 	pageData api.PaginationData,

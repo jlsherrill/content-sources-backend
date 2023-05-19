@@ -60,7 +60,6 @@ func (r pulpDaoImpl) SyncRpmRepository(rpmRpmRepositoryHref string, remoteHref *
 		rpmRepositoryHref.SetRemote(*remoteHref)
 	}
 	rpmRepositoryHref.SetSyncPolicy(*zest.SYNCPOLICYENUM_MIRROR_CONTENT_ONLY.Ptr())
-
 	resp, httpResp, err := r.client.RepositoriesRpmApi.RepositoriesRpmRpmSync(r.ctx, rpmRpmRepositoryHref).
 		RpmRepositorySyncURL(rpmRepositoryHref).Execute()
 	defer httpResp.Body.Close()

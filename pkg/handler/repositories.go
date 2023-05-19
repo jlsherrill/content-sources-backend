@@ -207,8 +207,10 @@ func (rh *RepositoryHandler) bulkCreateRepositories(c echo.Context) error {
 
 	// Produce an event for each repository
 	for _, repo := range responses {
+		rh.enqueueSnapshotEvent(repo, orgID)
 		rh.enqueueIntrospectEvent(c, repo, orgID)
 		log.Info().Msgf("bulkCreateRepositories produced IntrospectRequest event")
+
 	}
 
 	return c.JSON(http.StatusCreated, responses)
@@ -386,6 +388,16 @@ func (rh *RepositoryHandler) introspect(c echo.Context) error {
 	return c.NoContent(http.StatusNoContent)
 }
 
+func (rh *RepositoryHandler) enqueueSnapshotEvent(response api.RepositoryResponse, orgID string) {
+	if config.Get().NewTaskingSystem {
+		task := queue.Task{Typename: tasks.Snapshot, Payload: tasks.SnapshotPayload{}, OrgId: orgID, RepositoryUUID: response.RepositoryUUID}
+		_, err := rh.TaskClient.Enqueue(task)
+		if err != nil {
+			log.Error().Err(err).Msgf("error enqueuing task")
+		}
+	}
+}
+
 func (rh *RepositoryHandler) enqueueIntrospectEvent(c echo.Context, response api.RepositoryResponse, orgID string) {
 	var msg *message.IntrospectRequestMessage
 	var err error
@@ -393,7 +405,7 @@ func (rh *RepositoryHandler) enqueueIntrospectEvent(c echo.Context, response api
 		task := queue.Task{Typename: tasks.Introspect, Payload: tasks.IntrospectPayload{Url: response.URL}, OrgId: orgID, RepositoryUUID: response.RepositoryUUID}
 		_, err := rh.TaskClient.Enqueue(task)
 		if err != nil {
-			log.Error().Msgf("error enqueuing task: %s", err.Error())
+			log.Error().Err(err).Msgf("error enqueuing tasks")
 		}
 	} else {
 		if msg, err = adapter.NewIntrospect().FromRepositoryResponse(&response); err != nil {

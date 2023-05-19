@@ -37,6 +37,7 @@ type RepositoryConfigDao interface {
 	Delete(orgID string, uuid string) error
 	SavePublicRepos(urls []string) error
 	ValidateParameters(orgId string, params api.RepositoryValidationRequest, excludedUUIDS []string) (api.RepositoryValidationResponse, error)
+	FetchByRepoUuid(orgID string, repoUuid string) (api.RepositoryResponse, error)
 }
 
 type RpmDao interface {

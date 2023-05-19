@@ -257,6 +257,28 @@ func (r repositoryConfigDaoImpl) fetchRepoConfig(orgID string, uuid string) (mod
 	return found, nil
 }
 
+func (r repositoryConfigDaoImpl) FetchByRepoUuid(orgID string, repoUuid string) (api.RepositoryResponse, error) {
+
+	repoConfig := models.RepositoryConfiguration{}
+	repo := api.RepositoryResponse{}
+
+	result := r.db.
+		Preload("Repository").
+		Joins("Inner join repositories on repositories.uuid = repository_configurations.repository_uuid").
+		Where("text(Repositories.UUID) = ? AND ORG_ID = ?", repoUuid, orgID).
+		First(&repoConfig)
+
+	if result.Error != nil {
+		if result.Error == gorm.ErrRecordNotFound {
+			return repo, &ce.DaoError{NotFound: true, Message: "Could not find repository with UUID " + repoUuid}
+		} else {
+			return repo, DBErrorToApi(result.Error)
+		}
+	}
+	ModelToApiFields(repoConfig, &repo)
+	return repo, nil
+}
+
 func (r repositoryConfigDaoImpl) Update(orgID string, uuid string, repoParams api.RepositoryRequest) error {
 	var repo models.Repository
 	var repoConfig models.RepositoryConfiguration

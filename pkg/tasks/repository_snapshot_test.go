@@ -39,7 +39,7 @@ func (s *SnapshotSuite) TestSnapshotFull() {
 	remoteHref := s.mockRemoteCreate(repoConfig, false)
 	repoResp := s.mockRepoCreate(repoConfig, remoteHref, false)
 
-	taskHref := "syncTaskHref"
+	taskHref := "SyncTaskHref"
 	s.MockPulpClient.On("SyncRpmRepository", *(repoResp.PulpHref), (*string)(nil)).Return(taskHref, nil)
 
 	versionHref := s.mockSync(taskHref, true)
@@ -71,7 +71,7 @@ func (s *SnapshotSuite) TestSnapshotFull() {
 	}
 	s.mockDaoRegistry.Snapshot.On("Create", &expectedSnap).Return(nil).Once()
 
-	snapErr := SnapshotRepository(SnapshotOptions{
+	snapErr := SnapshotRepository(SnapshotPayload{
 		OrgId:          repoConfig.OrgID,
 		RepoConfigUuid: repoConfig.UUID,
 		DaoRegistry:    s.mockDaoRegistry.ToDaoRegistry(),
@@ -91,12 +91,12 @@ func (s *SnapshotSuite) TestSnapshotResync() {
 	remoteHref := s.mockRemoteCreate(repoConfig, true)
 	repoResp := s.mockRepoCreate(repoConfig, remoteHref, true)
 
-	taskHref := "syncTaskHref"
+	taskHref := "SyncTaskHref"
 	s.MockPulpClient.On("SyncRpmRepository", *(repoResp.PulpHref), (*string)(nil)).Return(taskHref, nil)
 
 	s.mockSync(taskHref, false)
 
-	snapErr := SnapshotRepository(SnapshotOptions{
+	snapErr := SnapshotRepository(SnapshotPayload{
 		OrgId:          repoConfig.OrgID,
 		RepoConfigUuid: repoConfig.UUID,
 		DaoRegistry:    s.mockDaoRegistry.ToDaoRegistry(),
@@ -122,7 +122,7 @@ func (s *SnapshotSuite) mockCreateDist(pubHref string) string {
 }
 
 func (s *SnapshotSuite) mockPublish(versionHref string, existing bool) string {
-	publishTaskHref := "syncTaskHref"
+	publishTaskHref := "SyncTaskHref"
 	pubHref := "/pulp/api/v3/publications/rpm/rpm/" + uuid.NewString() + "/"
 
 	if existing {

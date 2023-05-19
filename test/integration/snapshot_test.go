@@ -44,7 +44,7 @@ func (s *SnapshotSuite) TestSnapshot() {
 
 	assert.NoError(s.T(), err)
 
-	err = tasks.SnapshotRepository(tasks.SnapshotOptions{
+	err = tasks.SnapshotRepository(tasks.SnapshotPayload{
 		OrgId:          accountId,
 		RepoConfigUuid: repo.UUID,
 		DaoRegistry:    s.dao,

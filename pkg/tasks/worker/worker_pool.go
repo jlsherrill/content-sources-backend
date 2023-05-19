@@ -5,13 +5,14 @@ import (
 	"sync"
 	"time"
 
+	"github.com/content-services/content-sources-backend/pkg/config"
 	m "github.com/content-services/content-sources-backend/pkg/instrumentation"
 	"github.com/content-services/content-sources-backend/pkg/tasks/queue"
 	"github.com/rs/zerolog"
 	"github.com/rs/zerolog/log"
 )
 
-type TaskHandler func(ctx context.Context, task *queue.TaskInfo) error
+type TaskHandler func(ctx context.Context, task *queue.TaskInfo, queue *queue.Queue) error
 
 type TaskWorkerPool interface {
 	// StartWorkers Starts workers up to number numWorkers defined in config.
@@ -45,16 +46,15 @@ type Config struct {
 	Heartbeat         time.Duration
 }
 
-func NewTaskWorkerPool(config Config, queue queue.Queue, metrics *m.Metrics) TaskWorkerPool {
+func NewTaskWorkerPool(queue queue.Queue, metrics *m.Metrics) TaskWorkerPool {
 	workerWg := sync.WaitGroup{}
 	return &WorkerPool{
 		queue:             queue,
-		numWorkers:        config.NumWorkers,
+		numWorkers:        config.Get().Tasking.WorkerCount,
 		logger:            &log.Logger,
 		workerWg:          &workerWg,
 		handlers:          make(map[string]TaskHandler),
-		heartbeat:         config.Heartbeat,
-		heartbeatInterval: config.HeartbeatInterval,
+		heartbeatInterval: config.Get().Tasking.Heartbeat,
 		metrics:           metrics,
 	}
 }

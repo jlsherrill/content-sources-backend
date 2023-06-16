@@ -13,6 +13,7 @@ import (
 	"github.com/content-services/content-sources-backend/pkg/dao"
 	"github.com/content-services/content-sources-backend/pkg/db"
 	m "github.com/content-services/content-sources-backend/pkg/instrumentation"
+	"github.com/content-services/content-sources-backend/pkg/pulp_client"
 	"github.com/content-services/content-sources-backend/pkg/tasks"
 	"github.com/content-services/content-sources-backend/pkg/tasks/client"
 	"github.com/content-services/content-sources-backend/pkg/tasks/queue"
@@ -72,6 +73,45 @@ func (s *SnapshotSuite) TestSnapshot() {
 
 	// Start the task
 	taskClient := client.NewTaskClient(&s.queue)
+	s.snapshotAndWait(taskClient, repo, repoUuid)
+
+	// Verify the snapshot was created
+	snaps, err := s.dao.Snapshot.List(repo.UUID)
+	assert.NoError(s.T(), err)
+	assert.NotEmpty(s.T(), snaps)
+	time.Sleep(5 * time.Second)
+
+	// Fetch the repomd.xml to verify its being served
+	distPath := fmt.Sprintf("%s/pulp/content/%s/repodata/repomd.xml",
+		config.Get().Clients.Pulp.Server,
+		snaps[0].DistributionPath)
+	resp, err := http.Get(distPath)
+	assert.NoError(s.T(), err)
+	defer resp.Body.Close()
+	assert.Equal(s.T(), resp.StatusCode, 200)
+	body, err := io.ReadAll(resp.Body)
+	assert.NoError(s.T(), err)
+	assert.NotEmpty(s.T(), body)
+
+	// Update the url
+	newUrl := "https://fixtures.pulpproject.org/rpm-with-sha-512/"
+	urlUpdated, err := s.dao.RepositoryConfig.Update(accountId, repo.UUID, api.RepositoryRequest{URL: &newUrl})
+	assert.NoError(s.T(), err)
+	repo, err = s.dao.RepositoryConfig.Fetch(accountId, repo.UUID)
+	assert.NoError(s.T(), err)
+	repoUuid, err = uuid2.Parse(repo.RepositoryUUID)
+	assert.NoError(s.T(), err)
+	assert.True(s.T(), urlUpdated)
+	assert.NoError(s.T(), err)
+
+	s.snapshotAndWait(taskClient, repo, repoUuid)
+	remote, err := pulp_client.GetPulpClient().GetRpmRemoteByName(repo.UUID)
+	assert.NoError(s.T(), err)
+	assert.Equal(s.T(), repo.URL, remote.Url)
+}
+
+func (s *SnapshotSuite) snapshotAndWait(taskClient client.TaskClient, repo api.RepositoryResponse, repoUuid uuid2.UUID) {
+	var err error
 	taskUuid, err := taskClient.Enqueue(queue.Task{Typename: tasks.Snapshot, Payload: tasks.SnapshotPayload{}, OrgId: repo.OrgID,
 		RepositoryUUID: repoUuid.String()})
 	assert.NoError(s.T(), err)
@@ -91,22 +131,4 @@ func (s *SnapshotSuite) TestSnapshot() {
 	}
 	assert.Equal(s.T(), queue.StatusCompleted, taskInfo.Status)
 	assert.Empty(s.T(), taskInfo.Error)
-
-	// Verify the snapshot was created
-	snaps, err := s.dao.Snapshot.List(repo.UUID)
-	assert.NoError(s.T(), err)
-	assert.NotEmpty(s.T(), snaps)
-	time.Sleep(5 * time.Second)
-
-	// Fetch the repomd.xml to verify its being served
-	distPath := fmt.Sprintf("%s/pulp/content/%s/repodata/repomd.xml",
-		config.Get().Clients.Pulp.Server,
-		snaps[0].DistributionPath)
-	resp, err := http.Get(distPath)
-	assert.NoError(s.T(), err)
-	defer resp.Body.Close()
-	assert.Equal(s.T(), resp.StatusCode, 200)
-	body, err := io.ReadAll(resp.Body)
-	assert.NoError(s.T(), err)
-	assert.NotEmpty(s.T(), body)
 }

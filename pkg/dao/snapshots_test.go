@@ -8,13 +8,13 @@ import (
 	"github.com/stretchr/testify/suite"
 )
 
-type SnapshotsSuite struct {
+type RepositorySnapshotSuite struct {
 	*DaoSuite
 }
 
 func TestSnapshotsSuite(t *testing.T) {
 	m := DaoSuite{}
-	r := SnapshotsSuite{&m}
+	r := RepositorySnapshotSuite{&m}
 	suite.Run(t, &r)
 }
 
@@ -39,14 +39,14 @@ func (s *RepositorySnapshotSuite) TestCreateAndList() {
 	err = tx.Create(&rConfig).Error
 	assert.NoError(t, err)
 
-	snap := Snapshot{
+	snap := models.Snapshot{
 		Base:             models.Base{},
 		VersionHref:      "/pulp/version",
 		PublicationHref:  "/pulp/publication",
 		DistributionPath: "/path/to/distr",
 		OrgId:            "someOrg",
 		RepositoryUUID:   testRepository.UUID,
-		ContentCounts:    ContentCounts{"packages": int64(3)},
+		ContentCounts:    models.ContentCounts{"packages": int64(3)},
 	}
 
 	sDao := snapshotDaoImpl{db: tx}

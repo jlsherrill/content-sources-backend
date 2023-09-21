@@ -14,12 +14,6 @@
                 },
                 "type": "object"
             },
-            "api.FeatureSet": {
-                "additionalProperties": {
-                    "$ref": "#/components/schemas/api.Feature"
-                },
-                "type": "object"
-            },
             "api.FetchGPGKeyResponse": {
                 "properties": {
                     "gpg_key": {
@@ -759,7 +753,7 @@
                         "content": {
                             "application/json": {
                                 "schema": {
-                                    "$ref": "#/components/schemas/api.FeatureSet"
+                                    "$ref": "#/components/schemas/api.Feature"
                                 }
                             }
                         },

@@ -31,7 +31,7 @@ func RegisterFeaturesRoutes(engine *echo.Group) {
 // @Tags         features
 // @Accept       json
 // @Produce      json
-// @Success      200 {object} api.FeatureSet
+// @Success      200 {object} api.Feature
 // @Router       /features/ [get]
 func (fh *FeaturesHandler) listFeatures(c echo.Context) error {
 	set := make(api.FeatureSet)

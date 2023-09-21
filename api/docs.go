@@ -38,7 +38,7 @@ const docTemplate = `{
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "$ref": "#/definitions/api.FeatureSet"
+                            "$ref": "#/definitions/api.Feature"
                         }
                     }
                 }
@@ -1319,12 +1319,6 @@ const docTemplate = `{
                     "description": "Whether the feature is enabled on the running server",
                     "type": "boolean"
                 }
-            }
-        },
-        "api.FeatureSet": {
-            "type": "object",
-            "additionalProperties": {
-                "$ref": "#/definitions/api.Feature"
             }
         },
         "api.FetchGPGKeyResponse": {

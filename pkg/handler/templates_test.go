@@ -18,6 +18,7 @@ import (
 	"github.com/content-services/content-sources-backend/pkg/tasks"
 	"github.com/content-services/content-sources-backend/pkg/tasks/client"
 	"github.com/content-services/content-sources-backend/pkg/tasks/queue"
+	"github.com/content-services/content-sources-backend/pkg/test"
 	test_handler "github.com/content-services/content-sources-backend/pkg/test/handler"
 	"github.com/labstack/echo/v4"
 	"github.com/openlyinc/pointy"
@@ -85,7 +86,7 @@ func (suite *TemplatesSuite) TestCreate() {
 		Date:        time.Time{},
 	}
 
-	suite.reg.Template.On("Create", template).Return(expected, nil)
+	suite.reg.Template.On("Create", test.MockCtx(), template).Return(expected, nil)
 
 	body, err := json.Marshal(template)
 	require.NoError(suite.T(), err)
@@ -118,7 +119,7 @@ func (suite *TemplatesSuite) TestFetch() {
 		Date:        time.Time{},
 	}
 
-	suite.reg.Template.On("Fetch", orgID, uuid).Return(expected, nil)
+	suite.reg.Template.On("Fetch", test.MockCtx(), orgID, uuid).Return(expected, nil)
 
 	body, err := json.Marshal(expected)
 	require.NoError(suite.T(), err)
@@ -156,7 +157,7 @@ func (suite *TemplatesSuite) TestFetchNotFound() {
 		Message:  "Not found",
 	}
 
-	suite.reg.Template.On("Fetch", orgID, uuid).Return(api.TemplateResponse{}, &daoError)
+	suite.reg.Template.On("Fetch", test.MockCtx(), orgID, uuid).Return(api.TemplateResponse{}, &daoError)
 
 	body, err := json.Marshal(template)
 	require.NoError(suite.T(), err)
@@ -175,7 +176,7 @@ func (suite *TemplatesSuite) TestList() {
 	orgID := test_handler.MockOrgId
 	collection := createTemplateCollection(1, 10, 0)
 	paginationData := api.PaginationData{Limit: 10, Offset: DefaultOffset}
-	suite.reg.Template.On("List", orgID, paginationData, api.TemplateFilterData{}).Return(collection, int64(1), nil)
+	suite.reg.Template.On("List", test.MockCtx(), orgID, paginationData, api.TemplateFilterData{}).Return(collection, int64(1), nil)
 
 	path := fmt.Sprintf("%s/templates/?limit=%d", api.FullRootPath(), 10)
 	req := httptest.NewRequest(http.MethodGet, path, nil)
@@ -202,7 +203,7 @@ func (suite *TemplatesSuite) TestListNoTemplates() {
 
 	collection := api.TemplateCollectionResponse{}
 	paginationData := api.PaginationData{Limit: DefaultLimit, Offset: DefaultOffset}
-	suite.reg.Template.On("List", test_handler.MockOrgId, paginationData, api.TemplateFilterData{}).Return(collection, int64(0), nil)
+	suite.reg.Template.On("List", test.MockCtx(), test_handler.MockOrgId, paginationData, api.TemplateFilterData{}).Return(collection, int64(0), nil)
 
 	req := httptest.NewRequest(http.MethodGet, api.FullRootPath()+"/templates/", nil)
 	req.Header.Set(api.IdentityHeader, test_handler.EncodedIdentity(t))
@@ -229,8 +230,8 @@ func (suite *TemplatesSuite) TestTemplatePagedExtraRemaining() {
 	paginationData1 := api.PaginationData{Limit: 10, Offset: 0}
 	paginationData2 := api.PaginationData{Limit: 10, Offset: 100}
 
-	suite.reg.Template.On("List", test_handler.MockOrgId, paginationData1, api.TemplateFilterData{}).Return(collection, int64(102), nil).Once()
-	suite.reg.Template.On("List", test_handler.MockOrgId, paginationData2, api.TemplateFilterData{}).Return(collection, int64(102), nil).Once()
+	suite.reg.Template.On("List", test.MockCtx(), test_handler.MockOrgId, paginationData1, api.TemplateFilterData{}).Return(collection, int64(102), nil).Once()
+	suite.reg.Template.On("List", test.MockCtx(), test_handler.MockOrgId, paginationData2, api.TemplateFilterData{}).Return(collection, int64(102), nil).Once()
 
 	path := fmt.Sprintf("%s/templates/?limit=%d", api.FullRootPath(), 10)
 	req := httptest.NewRequest(http.MethodGet, path, nil)
@@ -264,7 +265,7 @@ func (suite *TemplatesSuite) TestListWithFilters() {
 	t := suite.T()
 	collection := api.TemplateCollectionResponse{}
 
-	suite.reg.Template.On("List", test_handler.MockOrgId, api.PaginationData{Limit: 100}, api.TemplateFilterData{Name: "template", Arch: "x86_64"}).Return(collection, int64(100), nil)
+	suite.reg.Template.On("List", test.MockCtx(), test_handler.MockOrgId, api.PaginationData{Limit: 100}, api.TemplateFilterData{Name: "template", Arch: "x86_64"}).Return(collection, int64(100), nil)
 
 	path := fmt.Sprintf("%s/templates/?name=%v&arch=%v", api.FullRootPath(), "template", "x86_64")
 	req := httptest.NewRequest(http.MethodGet, path, nil)
@@ -281,8 +282,8 @@ func (suite *TemplatesSuite) TestListPagedNoRemaining() {
 	paginationData2 := api.PaginationData{Limit: 10, Offset: 90}
 
 	collection := api.TemplateCollectionResponse{}
-	suite.reg.Template.On("List", test_handler.MockOrgId, paginationData1, api.TemplateFilterData{}).Return(collection, int64(100), nil)
-	suite.reg.Template.On("List", test_handler.MockOrgId, paginationData2, api.TemplateFilterData{}).Return(collection, int64(100), nil)
+	suite.reg.Template.On("List", test.MockCtx(), test_handler.MockOrgId, paginationData1, api.TemplateFilterData{}).Return(collection, int64(100), nil)
+	suite.reg.Template.On("List", test.MockCtx(), test_handler.MockOrgId, paginationData2, api.TemplateFilterData{}).Return(collection, int64(100), nil)
 
 	path := fmt.Sprintf("%s/templates/?limit=%d", api.FullRootPath(), 10)
 	req := httptest.NewRequest(http.MethodGet, path, nil)
@@ -320,7 +321,7 @@ func (suite *TemplatesSuite) TestListDaoError() {
 	}
 	paginationData := api.PaginationData{Limit: DefaultLimit}
 
-	suite.reg.Template.On("List", test_handler.MockOrgId, paginationData, api.TemplateFilterData{}).
+	suite.reg.Template.On("List", test.MockCtx(), test_handler.MockOrgId, paginationData, api.TemplateFilterData{}).
 		Return(api.TemplateCollectionResponse{}, int64(0), &daoError)
 
 	path := fmt.Sprintf("%s/templates/", api.FullRootPath())
@@ -346,12 +347,12 @@ func (suite *TemplatesSuite) TestDelete() {
 		Date:        time.Time{},
 	}
 
-	suite.reg.Template.On("Fetch", test_handler.MockOrgId, uuid).Return(expected, nil)
+	suite.reg.Template.On("Fetch", test.MockCtx(), test_handler.MockOrgId, uuid).Return(expected, nil)
 
 	_, err := json.Marshal(expected)
 	require.NoError(suite.T(), err)
 
-	suite.reg.Template.On("SoftDelete", test_handler.MockOrgId, uuid).Return(nil)
+	suite.reg.Template.On("SoftDelete", test.MockCtx(), test_handler.MockOrgId, uuid).Return(nil)
 	mockTemplateDeleteEvent(suite.tcMock, uuid)
 
 	req := httptest.NewRequest(http.MethodDelete, api.FullRootPath()+"/templates/"+uuid, nil)
@@ -411,7 +412,7 @@ func (suite *TemplatesSuite) TestPartialUpdate() {
 		Date:        time.Time{},
 	}
 
-	suite.reg.Template.On("Update", orgID, uuid, template).Return(expected, nil)
+	suite.reg.Template.On("Update", test.MockCtx(), orgID, uuid, template).Return(expected, nil)
 
 	body, err := json.Marshal(template)
 	require.NoError(suite.T(), err)
@@ -453,7 +454,7 @@ func (suite *TemplatesSuite) TestFullUpdate() {
 		Date:        *templateExpected.Date,
 	}
 
-	suite.reg.Template.On("Update", orgID, uuid, templateExpected).Return(expected, nil)
+	suite.reg.Template.On("Update", test.MockCtx(), orgID, uuid, templateExpected).Return(expected, nil)
 
 	body, err := json.Marshal(template)
 	require.NoError(suite.T(), err)

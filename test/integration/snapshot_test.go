@@ -41,7 +41,7 @@ type SnapshotSuite struct {
 
 func (s *SnapshotSuite) SetupTest() {
 	s.Suite.SetupTest()
-
+	s.ctx = context.Background() // Test Context
 	wkrQueue, err := queue.NewPgQueue(db.GetUrl())
 	require.NoError(s.T(), err)
 	s.queue = wkrQueue

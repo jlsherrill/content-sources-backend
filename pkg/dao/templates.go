@@ -76,7 +76,7 @@ func (t templateDaoImpl) create(tx *gorm.DB, reqTemplate api.TemplateRequest) (a
 
 	// Associate the template to repositories
 	if reqTemplate.RepositoryUUIDS == nil {
-		return api.TemplateResponse{}, ce.DaoError{
+		return api.TemplateResponse{}, &ce.DaoError{
 			Message:       "template must include repository uuids",
 			BadValidation: true,
 		}

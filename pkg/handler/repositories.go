@@ -97,7 +97,7 @@ func (rh *RepositoryHandler) listRepositories(c echo.Context) error {
 
 	repos, totalRepos, err := rh.DaoRegistry.RepositoryConfig.WithContext(c.Request().Context()).List(orgID, pageData, filterData)
 	if err != nil {
-		return ce.NewErrorResponse(ce.HttpCodeForDaoError(err), "Error listing repositories", err.Error())
+		return ce.NewErrorResponse(c, ce.HttpCodeForDaoError(err), "Error listing repositories", err.Error())
 	}
 
 	return c.JSON(200, setCollectionResponseMetadata(&repos, c, totalRepos))
@@ -125,7 +125,7 @@ func (rh *RepositoryHandler) createRepository(c echo.Context) error {
 		err           error
 	)
 	if err = c.Bind(&newRepository); err != nil {
-		return ce.NewErrorResponse(http.StatusBadRequest, "Error binding params", err.Error())
+		return ce.NewErrorResponse(c, http.StatusBadRequest, "Error binding params", err.Error())
 	}
 
 	accountID, orgID := getAccountIdOrgId(c)
@@ -139,7 +139,7 @@ func (rh *RepositoryHandler) createRepository(c echo.Context) error {
 
 	var response api.RepositoryResponse
 	if response, err = rh.DaoRegistry.RepositoryConfig.Create(newRepository); err != nil {
-		return ce.NewErrorResponse(ce.HttpCodeForDaoError(err), "Error creating repository", err.Error())
+		return ce.NewErrorResponse(c, ce.HttpCodeForDaoError(err), "Error creating repository", err.Error())
 	}
 	if response.Snapshot {
 		rh.enqueueSnapshotEvent(c, &response)
@@ -169,12 +169,12 @@ func (rh *RepositoryHandler) createRepository(c echo.Context) error {
 func (rh *RepositoryHandler) bulkCreateRepositories(c echo.Context) error {
 	var newRepositories []api.RepositoryRequest
 	if err := c.Bind(&newRepositories); err != nil {
-		return ce.NewErrorResponse(http.StatusBadRequest, "Error binding parameters", err.Error())
+		return ce.NewErrorResponse(c, http.StatusBadRequest, "Error binding parameters", err.Error())
 	}
 
 	if BulkCreateLimit < len(newRepositories) {
 		limitErrMsg := fmt.Sprintf("Cannot create more than %d repositories at once.", BulkCreateLimit)
-		return ce.NewErrorResponse(http.StatusRequestEntityTooLarge, "Error creating repositories", limitErrMsg)
+		return ce.NewErrorResponse(c, http.StatusRequestEntityTooLarge, "Error creating repositories", limitErrMsg)
 	}
 
 	accountID, orgID := getAccountIdOrgId(c)
@@ -226,7 +226,7 @@ func (rh *RepositoryHandler) fetch(c echo.Context) error {
 
 	response, err := rh.DaoRegistry.RepositoryConfig.WithContext(c.Request().Context()).Fetch(orgID, uuid)
 	if err != nil {
-		return ce.NewErrorResponse(ce.HttpCodeForDaoError(err), "Error fetching repository", err.Error())
+		return ce.NewErrorResponse(c, ce.HttpCodeForDaoError(err), "Error fetching repository", err.Error())
 	}
 	return c.JSON(http.StatusOK, response)
 }
@@ -277,7 +277,7 @@ func (rh *RepositoryHandler) update(c echo.Context, fillDefaults bool) error {
 	_, orgID := getAccountIdOrgId(c)
 
 	if err := c.Bind(&repoParams); err != nil {
-		return ce.NewErrorResponse(http.StatusBadRequest, "Error binding parameters", err.Error())
+		return ce.NewErrorResponse(c, http.StatusBadRequest, "Error binding parameters", err.Error())
 	}
 	if err := rh.CheckSnapshotForRepos(c, orgID, []api.RepositoryRequest{repoParams}); err != nil {
 		return err
@@ -288,23 +288,23 @@ func (rh *RepositoryHandler) update(c echo.Context, fillDefaults bool) error {
 
 	repoConfig, err := rh.DaoRegistry.RepositoryConfig.WithContext(c.Request().Context()).Fetch(orgID, uuid)
 	if err != nil {
-		return ce.NewErrorResponse(ce.HttpCodeForDaoError(err), "Error fetching repository", err.Error())
+		return ce.NewErrorResponse(c, ce.HttpCodeForDaoError(err), "Error fetching repository", err.Error())
 	}
 
 	urlUpdated, err := rh.DaoRegistry.RepositoryConfig.Update(orgID, uuid, repoParams)
 	if err != nil {
-		return ce.NewErrorResponse(ce.HttpCodeForDaoError(err), "Error updating repository", err.Error())
+		return ce.NewErrorResponse(c, ce.HttpCodeForDaoError(err), "Error updating repository", err.Error())
 	}
 
 	if urlUpdated {
 		snapInProgress, err := rh.DaoRegistry.TaskInfo.IsSnapshotInProgress(orgID, repoConfig.RepositoryUUID)
 		if err != nil {
-			return ce.NewErrorResponse(ce.HttpCodeForDaoError(err), "Error checking if snapshot is in progress", err.Error())
+			return ce.NewErrorResponse(c, ce.HttpCodeForDaoError(err), "Error checking if snapshot is in progress", err.Error())
 		}
 		if snapInProgress {
 			err = rh.TaskClient.SendCancelNotification(c.Request().Context(), repoConfig.LastSnapshotTaskUUID)
 			if err != nil {
-				return ce.NewErrorResponse(http.StatusInternalServerError, "Error canceling previous snapshot", err.Error())
+				return ce.NewErrorResponse(c, http.StatusInternalServerError, "Error canceling previous snapshot", err.Error())
 			}
 		}
 	}
@@ -315,7 +315,7 @@ func (rh *RepositoryHandler) update(c echo.Context, fillDefaults bool) error {
 	}
 
 	if err != nil {
-		return ce.NewErrorResponse(ce.HttpCodeForDaoError(err), "Error fetching repository", err.Error())
+		return ce.NewErrorResponse(c, ce.HttpCodeForDaoError(err), "Error fetching repository", err.Error())
 	}
 
 	if urlUpdated {
@@ -343,18 +343,18 @@ func (rh *RepositoryHandler) deleteRepository(c echo.Context) error {
 
 	repoConfig, err := rh.DaoRegistry.RepositoryConfig.WithContext(c.Request().Context()).Fetch(orgID, uuid)
 	if err != nil {
-		return ce.NewErrorResponse(ce.HttpCodeForDaoError(err), "Error fetching repository", err.Error())
+		return ce.NewErrorResponse(c, ce.HttpCodeForDaoError(err), "Error fetching repository", err.Error())
 	}
 
 	snapInProgress, err := rh.DaoRegistry.TaskInfo.IsSnapshotInProgress(orgID, repoConfig.RepositoryUUID)
 	if err != nil {
-		return ce.NewErrorResponse(ce.HttpCodeForDaoError(err), "Error checking if snapshot is in progress", err.Error())
+		return ce.NewErrorResponse(c, ce.HttpCodeForDaoError(err), "Error checking if snapshot is in progress", err.Error())
 	}
 	if snapInProgress {
-		return ce.NewErrorResponse(http.StatusBadRequest, "Cannot delete repository while snapshot is in progress", "")
+		return ce.NewErrorResponse(c, http.StatusBadRequest, "Cannot delete repository while snapshot is in progress", "")
 	}
 	if err := rh.DaoRegistry.RepositoryConfig.SoftDelete(orgID, uuid); err != nil {
-		return ce.NewErrorResponse(ce.HttpCodeForDaoError(err), "Error deleting repository", err.Error())
+		return ce.NewErrorResponse(c, ce.HttpCodeForDaoError(err), "Error deleting repository", err.Error())
 	}
 	rh.enqueueSnapshotDeleteEvent(c, orgID, repoConfig)
 
@@ -379,18 +379,18 @@ func (rh *RepositoryHandler) deleteRepository(c echo.Context) error {
 func (rh *RepositoryHandler) bulkDeleteRepositories(c echo.Context) error {
 	var body api.UUIDListRequest
 	if err := c.Bind(&body); err != nil {
-		return ce.NewErrorResponse(http.StatusBadRequest, "Error binding parameters", err.Error())
+		return ce.NewErrorResponse(c, http.StatusBadRequest, "Error binding parameters", err.Error())
 	}
 
 	uuids := body.UUIDs
 
 	if len(uuids) == 0 {
-		return ce.NewErrorResponse(http.StatusBadRequest, "Error deleting repositories", "Request body must contain at least 1 repository UUID to delete.")
+		return ce.NewErrorResponse(c, http.StatusBadRequest, "Error deleting repositories", "Request body must contain at least 1 repository UUID to delete.")
 	}
 
 	if BulkDeleteLimit < len(uuids) {
 		limitErrMsg := fmt.Sprintf("Cannot delete more than %d repositories at once.", BulkDeleteLimit)
-		return ce.NewErrorResponse(http.StatusRequestEntityTooLarge, "Error deleting repositories", limitErrMsg)
+		return ce.NewErrorResponse(c, http.StatusRequestEntityTooLarge, "Error deleting repositories", limitErrMsg)
 	}
 
 	_, orgID := getAccountIdOrgId(c)
@@ -451,27 +451,27 @@ func (rh *RepositoryHandler) bulkDeleteRepositories(c echo.Context) error {
 // @Failure      	500 {object} ce.ErrorResponse
 // @Router			/repositories/{uuid}/snapshot/ [post]
 func (rh *RepositoryHandler) createSnapshot(c echo.Context) error {
-	if err := CheckSnapshotAccessible(c.Request().Context()); err != nil {
+	if err := CheckSnapshotAccessible(c); err != nil {
 		return err
 	}
 	uuid := c.Param("uuid")
 	_, orgID := getAccountIdOrgId(c)
 	response, err := rh.DaoRegistry.RepositoryConfig.Fetch(orgID, uuid)
 	if err != nil {
-		return ce.NewErrorResponse(ce.HttpCodeForDaoError(err), "Error fetching repository", err.Error())
+		return ce.NewErrorResponse(c, ce.HttpCodeForDaoError(err), "Error fetching repository", err.Error())
 	}
 
 	inProgress, err := rh.DaoRegistry.TaskInfo.IsSnapshotInProgress(orgID, response.RepositoryUUID)
 	if err != nil {
-		return ce.NewErrorResponse(ce.HttpCodeForDaoError(err), "Error checking snapshot task", err.Error())
+		return ce.NewErrorResponse(c, ce.HttpCodeForDaoError(err), "Error checking snapshot task", err.Error())
 	}
 
 	if inProgress {
-		return ce.NewErrorResponse(http.StatusConflict, "Error snapshotting repository", "This repository is currently being snapshotted.")
+		return ce.NewErrorResponse(c, http.StatusConflict, "Error snapshotting repository", "This repository is currently being snapshotted.")
 	}
 
 	if !response.Snapshot {
-		return ce.NewErrorResponse(http.StatusBadRequest, "Error snapshotting repository", "Snapshotting not yet enabled for this repository.")
+		return ce.NewErrorResponse(c, http.StatusBadRequest, "Error snapshotting repository", "Snapshotting not yet enabled for this repository.")
 	}
 
 	rh.enqueueSnapshotEvent(c, &response)
@@ -498,17 +498,17 @@ func (rh *RepositoryHandler) introspect(c echo.Context) error {
 	uuid := c.Param("uuid")
 
 	if err := c.Bind(&req); err != nil {
-		return ce.NewErrorResponse(http.StatusBadRequest, "Error binding parameters", err.Error())
+		return ce.NewErrorResponse(c, http.StatusBadRequest, "Error binding parameters", err.Error())
 	}
 
 	response, err := rh.DaoRegistry.RepositoryConfig.WithContext(c.Request().Context()).Fetch(orgID, uuid)
 	if err != nil {
-		return ce.NewErrorResponse(ce.HttpCodeForDaoError(err), "Error fetching repository", err.Error())
+		return ce.NewErrorResponse(c, ce.HttpCodeForDaoError(err), "Error fetching repository", err.Error())
 	}
 
 	repo, err := rh.DaoRegistry.Repository.FetchForUrl(response.URL)
 	if err != nil {
-		return ce.NewErrorResponse(ce.HttpCodeForDaoError(err), "Error fetching repository uuid", err.Error())
+		return ce.NewErrorResponse(c, ce.HttpCodeForDaoError(err), "Error fetching repository uuid", err.Error())
 	}
 
 	if repo.LastIntrospectionTime != nil {
@@ -516,13 +516,12 @@ func (rh *RepositoryHandler) introspect(c echo.Context) error {
 		since := time.Since(*repo.LastIntrospectionTime)
 		if since < limit {
 			detail := fmt.Sprintf("This repository has been introspected recently. Try again in %v", (limit - since).Truncate(time.Second))
-			return ce.NewErrorResponse(http.StatusBadRequest, "Error introspecting repository", detail)
+			return ce.NewErrorResponse(c, http.StatusBadRequest, "Error introspecting repository", detail)
 		}
 	}
 
 	if repo.FailedIntrospectionsCount >= config.FailedIntrospectionsLimit+1 && !req.ResetCount {
-		return ce.NewErrorResponse(http.StatusBadRequest, "Too many failed introspections",
-			fmt.Sprintf("This repository has failed introspecting %v times.", repo.FailedIntrospectionsCount))
+		return ce.NewErrorResponse(c, http.StatusBadRequest, "Too many failed introspections", fmt.Sprintf("This repository has failed introspecting %v times.", repo.FailedIntrospectionsCount))
 	}
 
 	var repoUpdate dao.RepositoryUpdate
@@ -542,7 +541,7 @@ func (rh *RepositoryHandler) introspect(c echo.Context) error {
 	}
 
 	if err := rh.DaoRegistry.Repository.Update(repoUpdate); err != nil {
-		return ce.NewErrorResponse(ce.HttpCodeForDaoError(err), "Error resetting failed introspections count", err.Error())
+		return ce.NewErrorResponse(c, ce.HttpCodeForDaoError(err), "Error resetting failed introspections count", err.Error())
 	}
 
 	rh.enqueueIntrospectEvent(c, response, orgID)
@@ -570,11 +569,11 @@ func (rh *RepositoryHandler) getGpgKeyFile(c echo.Context) error {
 
 	resp, err := rh.DaoRegistry.RepositoryConfig.FetchWithoutOrgID(uuid)
 	if err != nil {
-		return ce.NewErrorResponse(ce.HttpCodeForDaoError(err), "Error fetching repository", err.Error())
+		return ce.NewErrorResponse(c, ce.HttpCodeForDaoError(err), "Error fetching repository", err.Error())
 	}
 	if resp.GpgKey == "" {
 		errMsg := fmt.Errorf("no GPG key found for this repository")
-		return ce.NewErrorResponse(http.StatusNotFound, "Error fetching gpg key", errMsg.Error())
+		return ce.NewErrorResponse(c, http.StatusNotFound, "Error fetching gpg key", errMsg.Error())
 	}
 	return c.String(http.StatusOK, resp.GpgKey)
 }
@@ -643,7 +642,7 @@ func (rh *RepositoryHandler) enqueueIntrospectEvent(c echo.Context, response api
 func (rh *RepositoryHandler) CheckSnapshotForRepos(c echo.Context, orgId string, repos []api.RepositoryRequest) error {
 	for _, repo := range repos {
 		if repo.Snapshot != nil && *repo.Snapshot {
-			if err := CheckSnapshotAccessible(c.Request().Context()); err != nil {
+			if err := CheckSnapshotAccessible(c); err != nil {
 				return err
 			}
 		}

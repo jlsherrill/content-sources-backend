@@ -47,14 +47,14 @@ func (rh *RepositoryParameterHandler) fetchGpgKey(c echo.Context) error {
 	var gpgKeyParams api.FetchGPGKeyRequest
 
 	if err := c.Bind(&gpgKeyParams); err != nil {
-		return ce.NewErrorResponse(http.StatusBadRequest, "Error binding parameters", err.Error())
+		return ce.NewErrorResponse(c, http.StatusBadRequest, "Error binding parameters", err.Error())
 	}
 
 	transport := http.Transport{ResponseHeaderTimeout: RequestTimeout}
 	client := http.Client{Timeout: RequestTimeout, Transport: &transport}
 	gpgKey, _, err := yum.FetchGPGKey(gpgKeyParams.URL, &client)
 	if err != nil {
-		httpError := ce.NewErrorResponse(http.StatusNotAcceptable, "", "Received response was not a valid GPG Key")
+		httpError := ce.NewErrorResponse(c, http.StatusNotAcceptable, "", "Received response was not a valid GPG Key")
 		return httpError
 	}
 
@@ -102,13 +102,13 @@ func (rph *RepositoryParameterHandler) validate(c echo.Context) error {
 	var validationParams []api.RepositoryValidationRequest
 
 	if err := c.Bind(&validationParams); err != nil {
-		return ce.NewErrorResponse(http.StatusBadRequest, "Error binding parameters", err.Error())
+		return ce.NewErrorResponse(c, http.StatusBadRequest, "Error binding parameters", err.Error())
 	}
 
 	repoCount := len(validationParams)
 	if BulkCreateLimit < repoCount {
 		limitErrMsg := fmt.Sprintf("Cannot validate more than %d repositories at once.", BulkCreateLimit)
-		return ce.NewErrorResponse(http.StatusRequestEntityTooLarge, "", limitErrMsg)
+		return ce.NewErrorResponse(c, http.StatusRequestEntityTooLarge, "", limitErrMsg)
 	}
 
 	// Create arrays to hold results and errors
@@ -143,7 +143,7 @@ func (rph *RepositoryParameterHandler) validate(c echo.Context) error {
 	// Check for any errors and return the first one.  Errors are fatal, not errors retrieving metadata.
 	for i := 0; i < len(errors); i++ {
 		if errors[i] != nil {
-			return ce.NewErrorResponse(ce.HttpCodeForDaoError(errors[i]), "Error validating repository", errors[i].Error())
+			return ce.NewErrorResponse(c, ce.HttpCodeForDaoError(errors[i]), "Error validating repository", errors[i].Error())
 		}
 	}
 

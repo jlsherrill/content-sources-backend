@@ -17,7 +17,7 @@ type AdminTaskHandler struct {
 
 func checkAccessible(next echo.HandlerFunc) echo.HandlerFunc {
 	return func(c echo.Context) error {
-		if err := CheckAdminTaskAccessible(c.Request().Context()); err != nil {
+		if err := CheckAdminTaskAccessible(c); err != nil {
 			return err
 		}
 		return next(c)
@@ -45,7 +45,7 @@ func (adminTaskHandler *AdminTaskHandler) listTasks(c echo.Context) error {
 
 	tasks, totalTasks, err := adminTaskHandler.DaoRegistry.AdminTask.List(pageData, filterData)
 	if err != nil {
-		return ce.NewErrorResponse(ce.HttpCodeForDaoError(err), "Error listing tasks", err.Error())
+		return ce.NewErrorResponse(c, ce.HttpCodeForDaoError(err), "Error listing tasks", err.Error())
 	}
 
 	return c.JSON(http.StatusOK, setCollectionResponseMetadata(&tasks, c, totalTasks))
@@ -56,7 +56,7 @@ func (adminTaskHandler *AdminTaskHandler) fetch(c echo.Context) error {
 
 	response, err := adminTaskHandler.DaoRegistry.AdminTask.Fetch(id)
 	if err != nil {
-		return ce.NewErrorResponse(ce.HttpCodeForDaoError(err), "Error fetching task", err.Error())
+		return ce.NewErrorResponse(c, ce.HttpCodeForDaoError(err), "Error fetching task", err.Error())
 	}
 	return c.JSON(http.StatusOK, response)
 }

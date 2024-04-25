@@ -33,14 +33,19 @@ func (er ErrorResponse) Error() string {
 	return msg
 }
 
-func NewErrorResponse(code int, title string, detail string) ErrorResponse {
-	return ErrorResponse{Errors: []HandlerError{
+func NewErrorResponse(c echo.Context, code int, title string, detail string) *ErrorResponse {
+	resp := ErrorResponse{Errors: []HandlerError{
 		{
 			Status: code,
 			Title:  title,
 			Detail: detail,
 		}},
 	}
+	c.JSON(code, resp)
+	if code >= 500 {
+		return &resp
+	}
+	return nil
 }
 
 // NewErrorResponseFromError creates a new ErrorResponse from a list of errors.

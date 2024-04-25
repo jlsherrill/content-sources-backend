@@ -48,13 +48,13 @@ func (rh *RpmHandler) searchRpmByName(c echo.Context) error {
 	_, orgId := getAccountIdOrgId(c)
 	dataInput := api.ContentUnitSearchRequest{}
 	if err := c.Bind(&dataInput); err != nil {
-		return ce.NewErrorResponse(http.StatusBadRequest, "Error binding parameters", err.Error())
+		return ce.NewErrorResponse(c, http.StatusBadRequest, "Error binding parameters", err.Error())
 	}
 	preprocessInput(&dataInput)
 
 	apiResponse, err := rh.Dao.Rpm.Search(orgId, dataInput)
 	if err != nil {
-		return ce.NewErrorResponse(ce.HttpCodeForDaoError(err), "Error searching RPMs", err.Error())
+		return ce.NewErrorResponse(c, ce.HttpCodeForDaoError(err), "Error searching RPMs", err.Error())
 	}
 
 	return c.JSON(200, apiResponse)
@@ -82,7 +82,7 @@ func (rh *RpmHandler) listRepositoriesRpm(c echo.Context) error {
 	// Read input information
 	rpmInput := api.ContentUnitListRequest{}
 	if err := c.Bind(&rpmInput); err != nil {
-		return ce.NewErrorResponse(http.StatusInternalServerError, "Error binding parameters", err.Error())
+		return ce.NewErrorResponse(c, http.StatusInternalServerError, "Error binding parameters", err.Error())
 	}
 
 	_, orgId := getAccountIdOrgId(c)
@@ -91,7 +91,7 @@ func (rh *RpmHandler) listRepositoriesRpm(c echo.Context) error {
 	// Request record from database
 	apiResponse, total, err := rh.Dao.Rpm.List(orgId, rpmInput.UUID, page.Limit, page.Offset, rpmInput.Search, rpmInput.SortBy)
 	if err != nil {
-		return ce.NewErrorResponse(ce.HttpCodeForDaoError(err), "Error listing RPMs", err.Error())
+		return ce.NewErrorResponse(c, ce.HttpCodeForDaoError(err), "Error listing RPMs", err.Error())
 	}
 
 	return c.JSON(200, setCollectionResponseMetadata(&apiResponse, c, total))
@@ -116,13 +116,13 @@ func (rh *RpmHandler) searchSnapshotRPMs(c echo.Context) error {
 	_, orgId := getAccountIdOrgId(c)
 	dataInput := api.SnapshotSearchRpmRequest{}
 
-	err := CheckSnapshotAccessible(c.Request().Context())
+	err := CheckSnapshotAccessible(c)
 	if err != nil {
 		return err
 	}
 
 	if err = c.Bind(&dataInput); err != nil {
-		return ce.NewErrorResponse(http.StatusBadRequest, "Error binding parameters", err.Error())
+		return ce.NewErrorResponse(c, http.StatusBadRequest, "Error binding parameters", err.Error())
 	}
 	if dataInput.Limit == nil || *dataInput.Limit > api.SearchRpmRequestLimitDefault {
 		dataInput.Limit = pointy.Pointer(api.SearchRpmRequestLimitDefault)
@@ -130,7 +130,7 @@ func (rh *RpmHandler) searchSnapshotRPMs(c echo.Context) error {
 
 	resp, err := rh.Dao.Rpm.SearchSnapshotRpms(c.Request().Context(), orgId, dataInput)
 	if err != nil {
-		return ce.NewErrorResponse(ce.HttpCodeForDaoError(err), "Error searching RPMs", err.Error())
+		return ce.NewErrorResponse(c, ce.HttpCodeForDaoError(err), "Error searching RPMs", err.Error())
 	}
 	return c.JSON(200, resp)
 }
@@ -156,7 +156,7 @@ func (rh *RpmHandler) listSnapshotRpm(c echo.Context) error {
 	// Read input information
 	rpmInput := api.ContentUnitListRequest{}
 	if err := c.Bind(&rpmInput); err != nil {
-		return ce.NewErrorResponse(http.StatusInternalServerError, "Error binding parameters", err.Error())
+		return ce.NewErrorResponse(c, http.StatusInternalServerError, "Error binding parameters", err.Error())
 	}
 
 	_, orgId := getAccountIdOrgId(c)
@@ -165,7 +165,7 @@ func (rh *RpmHandler) listSnapshotRpm(c echo.Context) error {
 	// Request record from database
 	data, total, err := rh.Dao.Rpm.ListSnapshotRpms(c.Request().Context(), orgId, []string{rpmInput.UUID}, rpmInput.Search, page)
 	if err != nil {
-		return ce.NewErrorResponse(ce.HttpCodeForDaoError(err), "Error listing RPMs", err.Error())
+		return ce.NewErrorResponse(c, ce.HttpCodeForDaoError(err), "Error listing RPMs", err.Error())
 	}
 
 	return c.JSON(200, setCollectionResponseMetadata(&api.SnapshotRpmCollectionResponse{Data: data}, c, int64(total)))
@@ -190,12 +190,12 @@ func (rh *RpmHandler) detectRpmsPresence(c echo.Context) error {
 	_, orgId := getAccountIdOrgId(c)
 	dataInput := api.DetectRpmsRequest{}
 	if err := c.Bind(&dataInput); err != nil {
-		return ce.NewErrorResponse(http.StatusBadRequest, "Error binding parameters", err.Error())
+		return ce.NewErrorResponse(c, http.StatusBadRequest, "Error binding parameters", err.Error())
 	}
 
 	apiResponse, err := rh.Dao.Rpm.DetectRpms(orgId, dataInput)
 	if err != nil {
-		return ce.NewErrorResponse(ce.HttpCodeForDaoError(err), "Error detecting RPMs", err.Error())
+		return ce.NewErrorResponse(c, ce.HttpCodeForDaoError(err), "Error detecting RPMs", err.Error())
 	}
 
 	return c.JSON(200, apiResponse)
@@ -224,7 +224,7 @@ func (rh *RpmHandler) listSnapshotErrata(c echo.Context) error {
 	// Read input information
 	snapshotErrataRequest := api.SnapshotErrataListRequest{}
 	if err := c.Bind(&snapshotErrataRequest); err != nil {
-		return ce.NewErrorResponse(http.StatusInternalServerError, "Error binding parameters", err.Error())
+		return ce.NewErrorResponse(c, http.StatusInternalServerError, "Error binding parameters", err.Error())
 	}
 
 	_, orgId := getAccountIdOrgId(c)
@@ -240,7 +240,7 @@ func (rh *RpmHandler) listSnapshotErrata(c echo.Context) error {
 	)
 
 	if err != nil {
-		return ce.NewErrorResponse(ce.HttpCodeForDaoError(err), "Error listing Errata", err.Error())
+		return ce.NewErrorResponse(c, ce.HttpCodeForDaoError(err), "Error listing Errata", err.Error())
 	}
 
 	return c.JSON(200, setCollectionResponseMetadata(&api.SnapshotErrataCollectionResponse{Data: data}, c, int64(total)))

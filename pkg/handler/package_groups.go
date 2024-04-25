@@ -44,13 +44,13 @@ func (rh *RepositoryPackageGroupHandler) searchPackageGroupByName(c echo.Context
 	_, orgId := getAccountIdOrgId(c)
 	dataInput := api.ContentUnitSearchRequest{}
 	if err := c.Bind(&dataInput); err != nil {
-		return ce.NewErrorResponse(http.StatusBadRequest, "Error binding parameters", err.Error())
+		return ce.NewErrorResponse(c, http.StatusBadRequest, "Error binding parameters", err.Error())
 	}
 	preprocessInput(&dataInput)
 
 	apiResponse, err := rh.Dao.PackageGroup.Search(orgId, dataInput)
 	if err != nil {
-		return ce.NewErrorResponse(ce.HttpCodeForDaoError(err), "Error searching package groups", err.Error())
+		return ce.NewErrorResponse(c, ce.HttpCodeForDaoError(err), "Error searching package groups", err.Error())
 	}
 
 	return c.JSON(200, apiResponse)
@@ -78,7 +78,7 @@ func (rh *RepositoryPackageGroupHandler) listRepositoriesPackageGroups(c echo.Co
 	// Read input information
 	packageGroupInput := api.ContentUnitListRequest{}
 	if err := c.Bind(&packageGroupInput); err != nil {
-		return ce.NewErrorResponse(http.StatusInternalServerError, "Error binding parameters", err.Error())
+		return ce.NewErrorResponse(c, http.StatusInternalServerError, "Error binding parameters", err.Error())
 	}
 
 	_, orgId := getAccountIdOrgId(c)
@@ -87,7 +87,7 @@ func (rh *RepositoryPackageGroupHandler) listRepositoriesPackageGroups(c echo.Co
 	// Request record from database
 	apiResponse, total, err := rh.Dao.PackageGroup.List(orgId, packageGroupInput.UUID, page.Limit, page.Offset, packageGroupInput.Search, packageGroupInput.SortBy)
 	if err != nil {
-		return ce.NewErrorResponse(ce.HttpCodeForDaoError(err), "Error listing package groups", err.Error())
+		return ce.NewErrorResponse(c, ce.HttpCodeForDaoError(err), "Error listing package groups", err.Error())
 	}
 
 	return c.JSON(200, setCollectionResponseMetadata(&apiResponse, c, total))
@@ -113,13 +113,13 @@ func (rh *RepositoryPackageGroupHandler) searchSnapshotPackageGroups(c echo.Cont
 	dataInput := api.SnapshotSearchRpmRequest{}
 
 	var err error
-	err = CheckSnapshotAccessible(c.Request().Context())
+	err = CheckSnapshotAccessible(c)
 	if err != nil {
 		return err
 	}
 
 	if err = c.Bind(&dataInput); err != nil {
-		return ce.NewErrorResponse(http.StatusBadRequest, "Error binding parameters", err.Error())
+		return ce.NewErrorResponse(c, http.StatusBadRequest, "Error binding parameters", err.Error())
 	}
 	if dataInput.Limit == nil || *dataInput.Limit > api.SearchRpmRequestLimitDefault {
 		dataInput.Limit = pointy.Pointer(api.SearchRpmRequestLimitDefault)
@@ -127,7 +127,7 @@ func (rh *RepositoryPackageGroupHandler) searchSnapshotPackageGroups(c echo.Cont
 
 	resp, err := rh.Dao.PackageGroup.SearchSnapshotPackageGroups(c.Request().Context(), orgId, dataInput)
 	if err != nil {
-		return ce.NewErrorResponse(ce.HttpCodeForDaoError(err), "Error searching package groups", err.Error())
+		return ce.NewErrorResponse(c, ce.HttpCodeForDaoError(err), "Error searching package groups", err.Error())
 	}
 	return c.JSON(200, resp)
 }

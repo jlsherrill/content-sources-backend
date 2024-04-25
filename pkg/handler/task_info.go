@@ -63,7 +63,7 @@ func (t *TaskInfoHandler) listTasks(c echo.Context) error {
 
 	tasks, totalTasks, err := t.DaoRegistry.TaskInfo.List(orgID, pageData, filterData)
 	if err != nil {
-		return ce.NewErrorResponse(ce.HttpCodeForDaoError(err), "Error listing tasks", err.Error())
+		return ce.NewErrorResponse(c, ce.HttpCodeForDaoError(err), "Error listing tasks", err.Error())
 	}
 
 	return c.JSON(http.StatusOK, setCollectionResponseMetadata(&tasks, c, totalTasks))
@@ -89,7 +89,7 @@ func (t *TaskInfoHandler) fetch(c echo.Context) error {
 
 	response, err := t.DaoRegistry.TaskInfo.Fetch(orgID, id)
 	if err != nil {
-		return ce.NewErrorResponse(ce.HttpCodeForDaoError(err), "Error fetching task", err.Error())
+		return ce.NewErrorResponse(c, ce.HttpCodeForDaoError(err), "Error fetching task", err.Error())
 	}
 	return c.JSON(http.StatusOK, response)
 }
@@ -100,14 +100,14 @@ func (t *TaskInfoHandler) cancel(c echo.Context) error {
 
 	task, err := t.DaoRegistry.TaskInfo.Fetch(orgID, id)
 	if err != nil {
-		return ce.NewErrorResponse(ce.HttpCodeForDaoError(err), "error canceling task", err.Error())
+		return ce.NewErrorResponse(c, ce.HttpCodeForDaoError(err), "error canceling task", err.Error())
 	}
 	if task.OrgId == config.RedHatOrg {
-		return ce.NewErrorResponse(http.StatusBadRequest, "Cannot cancel a Red Hat Task", err.Error())
+		return ce.NewErrorResponse(c, http.StatusBadRequest, "Cannot cancel a Red Hat Task", err.Error())
 	}
 	err = t.TaskClient.SendCancelNotification(c.Request().Context(), id)
 	if err != nil {
-		return ce.NewErrorResponse(http.StatusInternalServerError, "error canceling task", err.Error())
+		return ce.NewErrorResponse(c, http.StatusInternalServerError, "error canceling task", err.Error())
 	}
 	return c.NoContent(http.StatusNoContent)
 }

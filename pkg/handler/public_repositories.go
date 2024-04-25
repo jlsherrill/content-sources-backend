@@ -41,7 +41,7 @@ func (rh *PublicRepositoriesHandler) listPublicRepositories(c echo.Context) erro
 
 	repos, totalRepos, err := rh.DaoRegistry.Repository.ListPublic(pageData, filterData)
 	if err != nil {
-		return ce.NewErrorResponse(ce.HttpCodeForDaoError(err), "Error listing repositories", err.Error())
+		return ce.NewErrorResponse(c, ce.HttpCodeForDaoError(err), "Error listing repositories", err.Error())
 	}
 
 	return c.JSON(200, setCollectionResponseMetadata(&repos, c, totalRepos))

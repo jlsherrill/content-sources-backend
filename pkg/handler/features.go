@@ -74,25 +74,22 @@ func accessible(ctx context.Context, feature config.Feature) bool {
 	return false
 }
 
-func CheckSnapshotAccessible(ctx context.Context) (err error) {
+func CheckSnapshotAccessible(c echo.Context) (err error) {
 	if !config.Get().Features.Snapshots.Enabled {
-		return ce.NewErrorResponse(http.StatusBadRequest, "Snapshotting Feature is disabled.", "")
-	} else if accessible(ctx, config.Get().Features.Snapshots) {
+		return ce.NewErrorResponse(c, http.StatusBadRequest, "Snapshotting Feature is disabled.", "")
+	} else if accessible(c.Request().Context(), config.Get().Features.Snapshots) {
 		return nil
 	} else {
-		return ce.NewErrorResponse(http.StatusBadRequest, "Cannot manage repository snapshots",
-			"Neither the user nor the account is allowed.")
+		return ce.NewErrorResponse(c, http.StatusBadRequest, "Cannot manage repository snapshots", "Neither the user nor the account is allowed.")
 	}
 }
 
-func CheckAdminTaskAccessible(ctx context.Context) (err error) {
+func CheckAdminTaskAccessible(c echo.Context) (err error) {
 	if !config.Get().Features.AdminTasks.Enabled {
-		return ce.NewErrorResponse(http.StatusBadRequest, "Cannot manage admin tasks",
-			"Admin tasks feature is disabled.")
-	} else if accessible(ctx, config.Get().Features.AdminTasks) {
+		return ce.NewErrorResponse(c, http.StatusBadRequest, "Cannot manage admin tasks", "Admin tasks feature is disabled.")
+	} else if accessible(c.Request().Context(), config.Get().Features.AdminTasks) {
 		return nil
 	} else {
-		return ce.NewErrorResponse(http.StatusBadRequest, "Cannot manage admin tasks",
-			"Neither the user nor account is allowed.")
+		return ce.NewErrorResponse(c, http.StatusBadRequest, "Cannot manage admin tasks", "Neither the user nor account is allowed.")
 	}
 }

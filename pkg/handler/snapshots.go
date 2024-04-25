@@ -54,7 +54,7 @@ func (sh *SnapshotHandler) listSnapshots(c echo.Context) error {
 
 	snapshots, totalSnaps, err := sh.DaoRegistry.Snapshot.WithContext(c.Request().Context()).List(orgID, uuid, pageData, filterData)
 	if err != nil {
-		return ce.NewErrorResponse(ce.HttpCodeForDaoError(err), "Error listing repository snapshots", err.Error())
+		return ce.NewErrorResponse(c, ce.HttpCodeForDaoError(err), "Error listing repository snapshots", err.Error())
 	}
 	return c.JSON(200, setCollectionResponseMetadata(&snapshots, c, totalSnaps))
 }
@@ -77,7 +77,7 @@ func (sh *SnapshotHandler) listSnapshotsByDate(c echo.Context) error {
 	var listSnapshotByDateParams api.ListSnapshotByDateRequest
 
 	if err := c.Bind(&listSnapshotByDateParams); err != nil {
-		return ce.NewErrorResponse(http.StatusBadRequest, "Error binding parameters", err.Error())
+		return ce.NewErrorResponse(c, http.StatusBadRequest, "Error binding parameters", err.Error())
 	}
 
 	repoCount := len(listSnapshotByDateParams.RepositoryUUIDS)
@@ -88,20 +88,20 @@ func (sh *SnapshotHandler) listSnapshotsByDate(c echo.Context) error {
 			SnapshotByDateQueryLimit,
 			repoCount,
 		)
-		return ce.NewErrorResponse(http.StatusRequestEntityTooLarge, "", limitErrMsg)
+		return ce.NewErrorResponse(c, http.StatusRequestEntityTooLarge, "", limitErrMsg)
 	} else if repoCount == 0 {
 		badRequestMsg := fmt.Sprintf(
 			"Query must contain between 1 and %d repository_uuids, query contains 0 repository_uuids",
 			SnapshotByDateQueryLimit,
 		)
-		return ce.NewErrorResponse(http.StatusBadRequest, "", badRequestMsg)
+		return ce.NewErrorResponse(c, http.StatusBadRequest, "", badRequestMsg)
 	}
 
 	_, orgID := getAccountIdOrgId(c)
 	response, err := sh.DaoRegistry.Snapshot.FetchSnapshotsByDateAndRepository(orgID, listSnapshotByDateParams)
 
 	if err != nil {
-		return ce.NewErrorResponse(ce.HttpCodeForDaoError(err), "Error fetching snapshots", err.Error())
+		return ce.NewErrorResponse(c, ce.HttpCodeForDaoError(err), "Error fetching snapshots", err.Error())
 	}
 
 	return c.JSON(http.StatusOK, response)
@@ -131,7 +131,7 @@ func (sh *SnapshotHandler) getRepoConfigurationFile(c echo.Context) error {
 
 	repoConfigFile, err := sh.DaoRegistry.Snapshot.WithContext(c.Request().Context()).GetRepositoryConfigurationFile(orgID, snapshotUUID, host)
 	if err != nil {
-		return ce.NewErrorResponse(ce.HttpCodeForDaoError(err), "Error getting repository configuration file", err.Error())
+		return ce.NewErrorResponse(c, ce.HttpCodeForDaoError(err), "Error getting repository configuration file", err.Error())
 	}
 
 	return c.String(http.StatusOK, repoConfigFile)

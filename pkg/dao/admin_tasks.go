@@ -3,7 +3,7 @@ package dao
 import (
 	"encoding/json"
 	"errors"
-	"net/http"
+	"fmt"
 	"strings"
 	"time"
 
@@ -43,7 +43,7 @@ func (a adminTaskInfoDaoImpl) Fetch(id string) (api.AdminTaskInfoResponse, error
 	if taskInfo.Typename == payloads.Snapshot {
 		pulpData, err := getPulpData(taskInfo, a.pulpClient)
 		if err != nil {
-			return api.AdminTaskInfoResponse{}, ce.NewErrorResponse(http.StatusInternalServerError, "Error parsing task payload", err.Error())
+			return api.AdminTaskInfoResponse{}, fmt.Errorf("Error parsing task payload: %w", err)
 		}
 		taskInfoResponse.Pulp = pulpData
 	}

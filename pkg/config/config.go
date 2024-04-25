@@ -507,7 +507,7 @@ func CustomHTTPErrorHandler(err error, c echo.Context) {
 		message = errResp
 	} else {
 		code = http.StatusInternalServerError
-		message = ce.NewErrorResponse(code, "", http.StatusText(http.StatusInternalServerError))
+		message = *ce.NewErrorResponse(c, code, "", http.StatusText(http.StatusInternalServerError))
 	}
 
 	// Send response

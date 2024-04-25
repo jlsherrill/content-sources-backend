@@ -17,7 +17,7 @@ func TestNewErrorResponse(t *testing.T) {
 			Detail: "detail",
 		},
 	}}
-	result := NewErrorResponse(http.StatusBadRequest, "title", "detail")
+	result := NewErrorResponse(c, http.StatusBadRequest, "title", "detail")
 	assert.Equal(t, expected, result)
 }
 

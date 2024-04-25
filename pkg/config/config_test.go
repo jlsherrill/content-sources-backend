@@ -107,7 +107,7 @@ func TestCustomHTTPErrorHandler(t *testing.T) {
 	var testCases = []TestCase{
 		{
 			Name:     "ErrorResponse",
-			Given:    errors.NewErrorResponse(http.StatusBadRequest, http.StatusText(http.StatusBadRequest), ""),
+			Given:    errors.NewErrorResponse(c, http.StatusBadRequest, http.StatusText(http.StatusBadRequest), ""),
 			Expected: "{\"errors\":[{\"status\":400,\"title\":\"Bad Request\"}]}\n",
 		},
 		{

@@ -44,13 +44,13 @@ func (rh *RepositoryEnvironmentHandler) searchEnvironmentByName(c echo.Context) 
 	_, orgId := getAccountIdOrgId(c)
 	dataInput := api.ContentUnitSearchRequest{}
 	if err := c.Bind(&dataInput); err != nil {
-		return ce.NewErrorResponse(http.StatusBadRequest, "Error binding parameters", err.Error())
+		return ce.NewErrorResponse(c, http.StatusBadRequest, "Error binding parameters", err.Error())
 	}
 	preprocessInput(&dataInput)
 
 	apiResponse, err := rh.Dao.Environment.Search(orgId, dataInput)
 	if err != nil {
-		return ce.NewErrorResponse(ce.HttpCodeForDaoError(err), "Error searching environments", err.Error())
+		return ce.NewErrorResponse(c, ce.HttpCodeForDaoError(err), "Error searching environments", err.Error())
 	}
 
 	return c.JSON(200, apiResponse)
@@ -78,7 +78,7 @@ func (rh *RepositoryEnvironmentHandler) listRepositoriesEnvironments(c echo.Cont
 	// Read input information
 	environmentInput := api.ContentUnitListRequest{}
 	if err := c.Bind(&environmentInput); err != nil {
-		return ce.NewErrorResponse(http.StatusInternalServerError, "Error binding parameters", err.Error())
+		return ce.NewErrorResponse(c, http.StatusInternalServerError, "Error binding parameters", err.Error())
 	}
 
 	_, orgId := getAccountIdOrgId(c)
@@ -88,7 +88,7 @@ func (rh *RepositoryEnvironmentHandler) listRepositoriesEnvironments(c echo.Cont
 	apiResponse, total, err := rh.Dao.Environment.List(orgId, environmentInput.UUID, page.Limit, page.Offset, environmentInput.Search, environmentInput.SortBy)
 
 	if err != nil {
-		return ce.NewErrorResponse(ce.HttpCodeForDaoError(err), "Error listing environments", err.Error())
+		return ce.NewErrorResponse(c, ce.HttpCodeForDaoError(err), "Error listing environments", err.Error())
 	}
 
 	return c.JSON(200, setCollectionResponseMetadata(&apiResponse, c, total))
@@ -114,13 +114,13 @@ func (rh *RepositoryEnvironmentHandler) searchSnapshotEnvironments(c echo.Contex
 	dataInput := api.SnapshotSearchRpmRequest{}
 
 	var err error
-	err = CheckSnapshotAccessible(c.Request().Context())
+	err = CheckSnapshotAccessible(c)
 	if err != nil {
 		return err
 	}
 
 	if err = c.Bind(&dataInput); err != nil {
-		return ce.NewErrorResponse(http.StatusBadRequest, "Error binding parameters", err.Error())
+		return ce.NewErrorResponse(c, http.StatusBadRequest, "Error binding parameters", err.Error())
 	}
 	if dataInput.Limit == nil || *dataInput.Limit > api.SearchRpmRequestLimitDefault {
 		dataInput.Limit = pointy.Pointer(api.SearchRpmRequestLimitDefault)
@@ -128,7 +128,7 @@ func (rh *RepositoryEnvironmentHandler) searchSnapshotEnvironments(c echo.Contex
 
 	resp, err := rh.Dao.Environment.SearchSnapshotEnvironments(c.Request().Context(), orgId, dataInput)
 	if err != nil {
-		return ce.NewErrorResponse(ce.HttpCodeForDaoError(err), "Error searching environments", err.Error())
+		return ce.NewErrorResponse(c, ce.HttpCodeForDaoError(err), "Error searching environments", err.Error())
 	}
 	return c.JSON(200, resp)
 }

@@ -8,11 +8,11 @@ import (
 	"github.com/content-services/content-sources-backend/pkg/instrumentation"
 	"github.com/content-services/content-sources-backend/pkg/middleware"
 	"github.com/content-services/content-sources-backend/pkg/rbac"
-	"github.com/content-services/lecho/v3"
 	"github.com/labstack/echo/v4"
 	"github.com/redhatinsights/platform-go-middlewares/v2/identity"
 	"github.com/rs/zerolog"
 	"github.com/rs/zerolog/log"
+	"github.com/ziflex/lecho/v3"
 )
 
 func ConfigureEcho(allRoutes bool) *echo.Echo {
@@ -31,8 +31,8 @@ func ConfigureEcho(allRoutes bool) *echo.Echo {
 		Skipper:             config.SkipLogging,
 		RequestLatencyLevel: zerolog.WarnLevel,
 		RequestLatencyLimit: 500 * time.Millisecond,
+		HandleError:         true,
 	}))
-	e.Use(middleware.ExtractStatus) // Must be after lecho
 	e.Use(middleware.EnforceJSONContentType)
 
 	// Add routes

@@ -52,6 +52,7 @@ require (
 	github.com/redhatinsights/platform-go-middlewares/v2 v2.0.0-beta.2
 	github.com/redis/go-redis/v9 v9.5.1
 	github.com/xdg/scram v1.0.5
+	github.com/ziflex/lecho/v3 v3.6.0
 	go.uber.org/goleak v1.3.0
 	golang.org/x/exp v0.0.0-20240213143201-ec583247a57a
 )

@@ -22,6 +22,7 @@ type DaoRegistry struct {
 	AdminTask        AdminTaskDao
 	Domain           DomainDao
 	PackageGroup     PackageGroupDao
+	ModuleStream     ModuleStreamDao
 	Environment      EnvironmentDao
 	Template         TemplateDao
 }
@@ -48,6 +49,7 @@ func GetDaoRegistry(db *gorm.DB) *DaoRegistry {
 		PackageGroup: packageGroupDaoImpl{db: db},
 		Environment:  environmentDaoImpl{db: db},
 		Template:     templateDaoImpl{db: db, pulpClient: pulp_client.GetGlobalPulpClient()},
+		ModuleStream: moduleStreamDaoImpl{db: db},
 	}
 	return &reg
 }
@@ -151,6 +153,11 @@ type PackageGroupDao interface {
 	InsertForRepository(ctx context.Context, repoUuid string, pkgGroups []yum.PackageGroup) (int64, error)
 	OrphanCleanup(ctx context.Context) error
 	SearchSnapshotPackageGroups(ctx context.Context, orgId string, request api.SnapshotSearchRpmRequest) ([]api.SearchPackageGroupResponse, error)
+}
+
+type ModuleStreamDao interface {
+	InsertForRepository(ctx context.Context, repoUuid string, pkgGroups []yum.ModuleMD) (int64, error)
+	OrphanCleanup(ctx context.Context) error
 }
 
 type EnvironmentDao interface {

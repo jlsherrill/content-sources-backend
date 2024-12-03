@@ -16,6 +16,7 @@ type MockDaoRegistry struct {
 	PackageGroup     MockPackageGroupDao
 	Environment      MockEnvironmentDao
 	Template         MockTemplateDao
+	ModuleStream     MockModuleStreamDao
 }
 
 func (m *MockDaoRegistry) ToDaoRegistry() *DaoRegistry {
@@ -31,6 +32,7 @@ func (m *MockDaoRegistry) ToDaoRegistry() *DaoRegistry {
 		PackageGroup:     &m.PackageGroup,
 		Environment:      &m.Environment,
 		Template:         &m.Template,
+		ModuleStream:     &m.ModuleStream,
 	}
 	return &r
 }

@@ -22,9 +22,9 @@ type DaoRegistry struct {
 	AdminTask        AdminTaskDao
 	Domain           DomainDao
 	PackageGroup     PackageGroupDao
+	ModuleStream     ModuleStreamDao
 	Environment      EnvironmentDao
 	Template         TemplateDao
-	ModuleStreams    ModuleStreamsDao
 }
 
 func GetDaoRegistry(db *gorm.DB) *DaoRegistry {
@@ -37,9 +37,9 @@ func GetDaoRegistry(db *gorm.DB) *DaoRegistry {
 		Rpm: &rpmDaoImpl{
 			db: db,
 		},
-		ModuleStreams: &moduleStreamsImpl{db: db},
-		Repository:    repositoryDaoImpl{db: db},
-		Metrics:       metricsDaoImpl{db: db},
+		ModuleStream: &moduleStreamsImpl{db: db},
+		Repository:   repositoryDaoImpl{db: db},
+		Metrics:      metricsDaoImpl{db: db},
 		Snapshot: &snapshotDaoImpl{
 			db:         db,
 			pulpClient: pulp_client.GetPulpClientWithDomain(""),
@@ -80,8 +80,11 @@ type RepositoryConfigDao interface {
 	BulkImport(ctx context.Context, reposToImport []api.RepositoryRequest) ([]api.RepositoryImportResponse, []error)
 }
 
-type ModuleStreamsDao interface {
+type ModuleStreamDao interface {
+	SearchRepositoryModuleStreams(ctx context.Context, orgID string, request api.SearchModuleStreamsRequest) ([]api.SearchModuleStreams, error)
 	SearchSnapshotModuleStreams(ctx context.Context, orgID string, request api.SearchSnapshotModuleStreamsRequest) ([]api.SearchModuleStreams, error)
+	InsertForRepository(ctx context.Context, repoUuid string, pkgGroups []yum.ModuleMD) (int64, error)
+	OrphanCleanup(ctx context.Context) error
 }
 
 type RpmDao interface {

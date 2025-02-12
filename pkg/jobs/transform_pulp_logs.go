@@ -158,12 +158,28 @@ func convertToCsv(logs []PulpLogEvent) (compressedData *bytes.Buffer, err error)
 	return compressedData, nil
 }
 
+func checkS3Config(s3 config.ObjectStore) {
+	if s3.AccessKey == "" {
+		log.Warn().Msg("s3 access key is blank")
+	}
+	if s3.SecretKey == "" {
+		log.Warn().Msg("s3 secret key is blank")
+	}
+	if s3.Region == "" {
+		log.Warn().Msg("s3 region is blank")
+	}
+	if s3.Name == "" {
+		log.Warn().Msg("s3 name is blank")
+	}
+}
+
 func (t TransformPulpLogsJob) uploadGzipToS3(compressedData *bytes.Buffer, date time.Time) (err error) {
 	cfg := config.Get().Clients.PulpLogParser.S3
 	if cfg.Name == "" {
 		log.Warn().Msg("Not configured to upload to S3")
 		return nil
 	}
+	checkS3Config(cfg)
 
 	// Define S3 object key (file name), date of the logs with current unix time for uniqness
 	s3Key := fmt.Sprintf("%s/%s-%v.json.gz", cfg.FilePrefix, date.Format("2006-01-02"), time.Now().Unix())

@@ -296,6 +296,7 @@ type Options struct {
 	LoadLightwellDemo            bool     `mapstructure:"load_lightwell_demo"`
 	SeedLightwell                bool     `mapstructure:"seed_lightwell"`
 	SeedLightwellCoverageReports bool     `mapstructure:"seed_lightwell_coverage_reports"`
+	JFrogBridgeEnabled           bool     `mapstructure:"jfrog_bridge_enabled"`
 }
 
 type Metrics struct {
@@ -374,6 +375,7 @@ func setDefaults(v *viper.Viper) {
 	v.SetDefault("options.load_lightwell_demo", true)
 	v.SetDefault("options.seed_lightwell", false)
 	v.SetDefault("options.seed_lightwell_coverage_reports", false)
+	v.SetDefault("options.jfrog_bridge_enabled", false)
 	v.SetDefault("logging.level", "info")
 	v.SetDefault("logging.metrics_level", "error")
 	v.SetDefault("logging.db_level", "")

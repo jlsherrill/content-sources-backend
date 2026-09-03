@@ -63,6 +63,7 @@ options:
   introspect_api_time_limit_sec: 0
   enable_notifications: true
   lightwell_bridge_topic: "platform.lightwell.advisory-created"
+  jfrog_bridge_enable: false
   template_event_topic: "platform.content-sources.template"
   snapshot_retain_days_limit: 365
   feature_filter: ["RHEL-OS-x86_64"]

@@ -195,6 +195,8 @@ objects:
                 value: ${OPTIONS_ALWAYS_RUN_CRON_TASKS}
               - name: OPTIONS_ENABLE_NOTIFICATIONS
                 value: ${OPTIONS_ENABLE_NOTIFICATIONS}
+              - name: OPTIONS_JFROG_BRIDGE_ENABLE
+                value: ${OPTIONS_JFROG_BRIDGE_ENABLE}
               - name: OPTIONS_LIGHTWELL_BRIDGE_TOPIC
                 value: ${OPTIONS_LIGHTWELL_BRIDGE_TOPIC}
               - name: SENTRY_DSN
@@ -413,6 +415,7 @@ objects:
               - api
               - instrumentation
               - pulp-data-importer
+              - jfrog-bridge
             livenessProbe:
               failureThreshold: 3
               httpGet:
@@ -543,6 +546,8 @@ objects:
                 value: ${OPTIONS_ALWAYS_RUN_CRON_TASKS}
               - name: OPTIONS_ENABLE_NOTIFICATIONS
                 value: ${OPTIONS_ENABLE_NOTIFICATIONS}
+              - name: OPTIONS_JFROG_BRIDGE_ENABLE
+                value: ${OPTIONS_JFROG_BRIDGE_ENABLE}
               - name: OPTIONS_LIGHTWELL_BRIDGE_TOPIC
                 value: ${OPTIONS_LIGHTWELL_BRIDGE_TOPIC}
               - name: SENTRY_DSN
@@ -858,6 +863,8 @@ objects:
                 value: ${OPTIONS_ALWAYS_RUN_CRON_TASKS}
               - name: OPTIONS_ENABLE_NOTIFICATIONS
                 value: ${OPTIONS_ENABLE_NOTIFICATIONS}
+              - name: OPTIONS_JFROG_BRIDGE_ENABLE
+                value: ${OPTIONS_JFROG_BRIDGE_ENABLE}
               - name: OPTIONS_LIGHTWELL_BRIDGE_TOPIC
                 value: ${OPTIONS_LIGHTWELL_BRIDGE_TOPIC}
               - name: SENTRY_DSN
@@ -1161,6 +1168,8 @@ objects:
                 value: ${OPTIONS_ALWAYS_RUN_CRON_TASKS}
               - name: OPTIONS_ENABLE_NOTIFICATIONS
                 value: ${OPTIONS_ENABLE_NOTIFICATIONS}
+              - name: OPTIONS_JFROG_BRIDGE_ENABLE
+                value: ${OPTIONS_JFROG_BRIDGE_ENABLE}
               - name: OPTIONS_LIGHTWELL_BRIDGE_TOPIC
                 value: ${OPTIONS_LIGHTWELL_BRIDGE_TOPIC}
               - name: SENTRY_DSN
@@ -1467,6 +1476,8 @@ objects:
                 value: ${OPTIONS_ALWAYS_RUN_CRON_TASKS}
               - name: OPTIONS_ENABLE_NOTIFICATIONS
                 value: ${OPTIONS_ENABLE_NOTIFICATIONS}
+              - name: OPTIONS_JFROG_BRIDGE_ENABLE
+                value: ${OPTIONS_JFROG_BRIDGE_ENABLE}
               - name: OPTIONS_LIGHTWELL_BRIDGE_TOPIC
                 value: ${OPTIONS_LIGHTWELL_BRIDGE_TOPIC}
               - name: SENTRY_DSN
@@ -1774,6 +1785,8 @@ objects:
                 value: ${OPTIONS_ALWAYS_RUN_CRON_TASKS}
               - name: OPTIONS_ENABLE_NOTIFICATIONS
                 value: ${OPTIONS_ENABLE_NOTIFICATIONS}
+              - name: OPTIONS_JFROG_BRIDGE_ENABLE
+                value: ${OPTIONS_JFROG_BRIDGE_ENABLE}
               - name: OPTIONS_LIGHTWELL_BRIDGE_TOPIC
                 value: ${OPTIONS_LIGHTWELL_BRIDGE_TOPIC}
               - name: SENTRY_DSN
@@ -2083,6 +2096,8 @@ objects:
                 value: ${OPTIONS_ALWAYS_RUN_CRON_TASKS}
               - name: OPTIONS_ENABLE_NOTIFICATIONS
                 value: ${OPTIONS_ENABLE_NOTIFICATIONS}
+              - name: OPTIONS_JFROG_BRIDGE_ENABLE
+                value: ${OPTIONS_JFROG_BRIDGE_ENABLE}
               - name: OPTIONS_LIGHTWELL_BRIDGE_TOPIC
                 value: ${OPTIONS_LIGHTWELL_BRIDGE_TOPIC}
               - name: SENTRY_DSN
@@ -2390,6 +2405,8 @@ objects:
                 value: ${OPTIONS_ALWAYS_RUN_CRON_TASKS}
               - name: OPTIONS_ENABLE_NOTIFICATIONS
                 value: ${OPTIONS_ENABLE_NOTIFICATIONS}
+              - name: OPTIONS_JFROG_BRIDGE_ENABLE
+                value: ${OPTIONS_JFROG_BRIDGE_ENABLE}
               - name: OPTIONS_LIGHTWELL_BRIDGE_TOPIC
                 value: ${OPTIONS_LIGHTWELL_BRIDGE_TOPIC}
               - name: SENTRY_DSN
@@ -2694,6 +2711,8 @@ objects:
                 value: ${OPTIONS_ALWAYS_RUN_CRON_TASKS}
               - name: OPTIONS_ENABLE_NOTIFICATIONS
                 value: ${OPTIONS_ENABLE_NOTIFICATIONS}
+              - name: OPTIONS_JFROG_BRIDGE_ENABLE
+                value: ${OPTIONS_JFROG_BRIDGE_ENABLE}
               - name: OPTIONS_LIGHTWELL_BRIDGE_TOPIC
                 value: ${OPTIONS_LIGHTWELL_BRIDGE_TOPIC}
               - name: SENTRY_DSN
@@ -2998,6 +3017,8 @@ objects:
                 value: ${OPTIONS_ALWAYS_RUN_CRON_TASKS}
               - name: OPTIONS_ENABLE_NOTIFICATIONS
                 value: ${OPTIONS_ENABLE_NOTIFICATIONS}
+              - name: OPTIONS_JFROG_BRIDGE_ENABLE
+                value: ${OPTIONS_JFROG_BRIDGE_ENABLE}
               - name: OPTIONS_LIGHTWELL_BRIDGE_TOPIC
                 value: ${OPTIONS_LIGHTWELL_BRIDGE_TOPIC}
               - name: SENTRY_DSN
@@ -3302,6 +3323,8 @@ objects:
                 value: ${OPTIONS_ALWAYS_RUN_CRON_TASKS}
               - name: OPTIONS_ENABLE_NOTIFICATIONS
                 value: ${OPTIONS_ENABLE_NOTIFICATIONS}
+              - name: OPTIONS_JFROG_BRIDGE_ENABLE
+                value: ${OPTIONS_JFROG_BRIDGE_ENABLE}
               - name: OPTIONS_LIGHTWELL_BRIDGE_TOPIC
                 value: ${OPTIONS_LIGHTWELL_BRIDGE_TOPIC}
               - name: SENTRY_DSN
@@ -3629,6 +3652,8 @@ objects:
                 value: ${OPTIONS_ALWAYS_RUN_CRON_TASKS}
               - name: OPTIONS_ENABLE_NOTIFICATIONS
                 value: ${OPTIONS_ENABLE_NOTIFICATIONS}
+              - name: OPTIONS_JFROG_BRIDGE_ENABLE
+                value: ${OPTIONS_JFROG_BRIDGE_ENABLE}
               - name: OPTIONS_LIGHTWELL_BRIDGE_TOPIC
                 value: ${OPTIONS_LIGHTWELL_BRIDGE_TOPIC}
               - name: SENTRY_DSN
@@ -3934,6 +3959,8 @@ objects:
                 value: ${OPTIONS_ALWAYS_RUN_CRON_TASKS}
               - name: OPTIONS_ENABLE_NOTIFICATIONS
                 value: ${OPTIONS_ENABLE_NOTIFICATIONS}
+              - name: OPTIONS_JFROG_BRIDGE_ENABLE
+                value: ${OPTIONS_JFROG_BRIDGE_ENABLE}
               - name: OPTIONS_LIGHTWELL_BRIDGE_TOPIC
                 value: ${OPTIONS_LIGHTWELL_BRIDGE_TOPIC}
               - name: SENTRY_DSN
@@ -4256,6 +4283,8 @@ objects:
                 value: ${OPTIONS_ALWAYS_RUN_CRON_TASKS}
               - name: OPTIONS_ENABLE_NOTIFICATIONS
                 value: ${OPTIONS_ENABLE_NOTIFICATIONS}
+              - name: OPTIONS_JFROG_BRIDGE_ENABLE
+                value: ${OPTIONS_JFROG_BRIDGE_ENABLE}
               - name: OPTIONS_LIGHTWELL_BRIDGE_TOPIC
                 value: ${OPTIONS_LIGHTWELL_BRIDGE_TOPIC}
               - name: SENTRY_DSN
@@ -4557,6 +4586,8 @@ objects:
                 value: ${OPTIONS_ALWAYS_RUN_CRON_TASKS}
               - name: OPTIONS_ENABLE_NOTIFICATIONS
                 value: ${OPTIONS_ENABLE_NOTIFICATIONS}
+              - name: OPTIONS_JFROG_BRIDGE_ENABLE
+                value: ${OPTIONS_JFROG_BRIDGE_ENABLE}
               - name: OPTIONS_LIGHTWELL_BRIDGE_TOPIC
                 value: ${OPTIONS_LIGHTWELL_BRIDGE_TOPIC}
               - name: SENTRY_DSN
@@ -4858,6 +4889,8 @@ objects:
                 value: ${OPTIONS_ALWAYS_RUN_CRON_TASKS}
               - name: OPTIONS_ENABLE_NOTIFICATIONS
                 value: ${OPTIONS_ENABLE_NOTIFICATIONS}
+              - name: OPTIONS_JFROG_BRIDGE_ENABLE
+                value: ${OPTIONS_JFROG_BRIDGE_ENABLE}
               - name: OPTIONS_LIGHTWELL_BRIDGE_TOPIC
                 value: ${OPTIONS_LIGHTWELL_BRIDGE_TOPIC}
               - name: SENTRY_DSN
@@ -5159,6 +5192,8 @@ objects:
                 value: ${OPTIONS_ALWAYS_RUN_CRON_TASKS}
               - name: OPTIONS_ENABLE_NOTIFICATIONS
                 value: ${OPTIONS_ENABLE_NOTIFICATIONS}
+              - name: OPTIONS_JFROG_BRIDGE_ENABLE
+                value: ${OPTIONS_JFROG_BRIDGE_ENABLE}
               - name: OPTIONS_LIGHTWELL_BRIDGE_TOPIC
                 value: ${OPTIONS_LIGHTWELL_BRIDGE_TOPIC}
               - name: SENTRY_DSN
@@ -5460,6 +5495,8 @@ objects:
                 value: ${OPTIONS_ALWAYS_RUN_CRON_TASKS}
               - name: OPTIONS_ENABLE_NOTIFICATIONS
                 value: ${OPTIONS_ENABLE_NOTIFICATIONS}
+              - name: OPTIONS_JFROG_BRIDGE_ENABLE
+                value: ${OPTIONS_JFROG_BRIDGE_ENABLE}
               - name: OPTIONS_LIGHTWELL_BRIDGE_TOPIC
                 value: ${OPTIONS_LIGHTWELL_BRIDGE_TOPIC}
               - name: SENTRY_DSN
@@ -5761,6 +5798,8 @@ objects:
                 value: ${OPTIONS_ALWAYS_RUN_CRON_TASKS}
               - name: OPTIONS_ENABLE_NOTIFICATIONS
                 value: ${OPTIONS_ENABLE_NOTIFICATIONS}
+              - name: OPTIONS_JFROG_BRIDGE_ENABLE
+                value: ${OPTIONS_JFROG_BRIDGE_ENABLE}
               - name: OPTIONS_LIGHTWELL_BRIDGE_TOPIC
                 value: ${OPTIONS_LIGHTWELL_BRIDGE_TOPIC}
               - name: SENTRY_DSN
@@ -6062,6 +6101,8 @@ objects:
                 value: ${OPTIONS_ALWAYS_RUN_CRON_TASKS}
               - name: OPTIONS_ENABLE_NOTIFICATIONS
                 value: ${OPTIONS_ENABLE_NOTIFICATIONS}
+              - name: OPTIONS_JFROG_BRIDGE_ENABLE
+                value: ${OPTIONS_JFROG_BRIDGE_ENABLE}
               - name: OPTIONS_LIGHTWELL_BRIDGE_TOPIC
                 value: ${OPTIONS_LIGHTWELL_BRIDGE_TOPIC}
               - name: SENTRY_DSN
@@ -6363,6 +6404,8 @@ objects:
                 value: ${OPTIONS_ALWAYS_RUN_CRON_TASKS}
               - name: OPTIONS_ENABLE_NOTIFICATIONS
                 value: ${OPTIONS_ENABLE_NOTIFICATIONS}
+              - name: OPTIONS_JFROG_BRIDGE_ENABLE
+                value: ${OPTIONS_JFROG_BRIDGE_ENABLE}
               - name: OPTIONS_LIGHTWELL_BRIDGE_TOPIC
                 value: ${OPTIONS_LIGHTWELL_BRIDGE_TOPIC}
               - name: SENTRY_DSN

@@ -53,6 +53,13 @@ func syncLightwellAdvisories(ctx context.Context, database *gorm.DB, force bool)
 		return fmt.Errorf("error loading lightwell allowlist: %w", err)
 	}
 
+	demoEntries, err := external_repos.LoadLightwellDemoAllowlist()
+	if err != nil {
+		return fmt.Errorf("error loading lightwell demo allowlist: %w", err)
+	}
+
+	lightwellEntries = append(lightwellEntries, demoEntries...)
+
 	httpClient := &http.Client{Timeout: 90 * time.Second}
 
 	var errs []error
